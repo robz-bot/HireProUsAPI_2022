@@ -9,6 +9,7 @@ import java.util.List;
 import com.promantus.hireprous.dto.CandidateDto;
 import com.promantus.hireprous.dto.CandidateStatusDto;
 import com.promantus.hireprous.dto.CandidatesCountDto;
+import com.promantus.hireprous.dto.EvaluateResumeDto;
 
 /**
  * @author Sihab.
@@ -216,6 +217,8 @@ public interface CandidateService {
 	List<CandidateDto> searchAllCandidateForDownload(CandidateDto candidateDto) throws Exception;
 
 	// Added on 1/5/2022
-	CandidateDto rejectToUploadedStatus(CandidateDto candidateDto, String jrNumber, String lang);
+	CandidateDto rejectToUploadedStatus(CandidateDto candidateDto, String jrNumber, String lang);EvaluateResumeDto getEvaluateResume(String jrNumber, String candidateId);
+
+	
 
 }

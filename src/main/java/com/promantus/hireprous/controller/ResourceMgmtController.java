@@ -118,13 +118,13 @@ public class ResourceMgmtController extends CommonController {
 			if (resourceMgmtDto.getProjectAllocation() == null || resourceMgmtDto.getProjectAllocation().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", Project Allocation" : "Project Allocation");
 			} else if (resourceMgmtDto.getProjectAllocation().equals("Yes")) {
-				// Project Id.
-				if (resourceMgmtDto.getProjectId() == 0) {
-					errorParam.append(errorParam.length() > 0 ? ", Project" : "Project");
-				}
 				// Customer Id.
 				if (resourceMgmtDto.getCustomerId() == 0) {
 					errorParam.append(errorParam.length() > 0 ? ", Customer" : "Customer");
+				}
+				// Project Id.
+				if (resourceMgmtDto.getProjectId() == 0) {
+					errorParam.append(errorParam.length() > 0 ? ", Project" : "Project");
 				}
 			}
 

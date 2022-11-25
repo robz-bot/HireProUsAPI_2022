@@ -33,6 +33,7 @@ public class Candidate {
 	private String skillSet;
 	private String experience;
 	private String currentCompany;
+	private String currentDesignation;
 
 	private String candidateType;
 
@@ -297,4 +298,14 @@ public class Candidate {
 	public void setVendorId(Long vendorId) {
 		this.vendorId = vendorId;
 	}
+
+	public String getCurrentDesignation() {
+		return currentDesignation;
+	}
+
+	public void setCurrentDesignation(String currentDesignation) {
+		this.currentDesignation = currentDesignation;
+	}
+	
+	
 }

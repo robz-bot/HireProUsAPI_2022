@@ -38,6 +38,7 @@ public class JobRequestDto implements Serializable {
 	private String employmentType;
 	private String contractDuration;
 	private String monthOrYear;
+	private String minYearOfExp;
 
 	private Long requesterId;
 
@@ -798,4 +799,15 @@ public class JobRequestDto implements Serializable {
 	public void setVendorActionStatus(String vendorActionStatus) {
 		this.vendorActionStatus = vendorActionStatus;
 	}
+
+	public String getMinYearOfExp() {
+		return minYearOfExp;
+	}
+
+	public void setMinYearOfExp(String minYearOfExp) {
+		this.minYearOfExp = minYearOfExp;
+	}
+
+	
+	
 }

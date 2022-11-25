@@ -37,6 +37,7 @@ public class JobRequest {
 	private String employmentType;
 	private String contractDuration;
 	private String monthOrYear;
+	private String minYearOfExp;
 
 	private Long requesterId;
 
@@ -522,4 +523,15 @@ public class JobRequest {
 	public void setVendorPriority(String vendorPriority) {
 		this.vendorPriority = vendorPriority;
 	}
+
+	public String getMinYearOfExp() {
+		return minYearOfExp;
+	}
+
+	public void setMinYearOfExp(String minYearOfExp) {
+		this.minYearOfExp = minYearOfExp;
+	}
+
+	
+	
 }

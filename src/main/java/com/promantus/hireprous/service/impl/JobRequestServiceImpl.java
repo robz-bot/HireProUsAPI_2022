@@ -106,6 +106,7 @@ public class JobRequestServiceImpl implements JobRequestService {
 
 		jobRequest.setNoOfOpenings(jobRequestDto.getNoOfOpenings());
 		jobRequest.setClosedOpenings(0);
+		jobRequest.setMinYearOfExp(jobRequestDto.getMinYearOfExp());
 
 		jobRequest.setLocation(jobRequestDto.getLocation());
 		jobRequest.setPayRange(jobRequestDto.getPayRange());
@@ -216,6 +217,7 @@ public class JobRequestServiceImpl implements JobRequestService {
 		jobRequest.setRoleId(jobRequestDto.getRoleId());
 
 		jobRequest.setNoOfOpenings(jobRequestDto.getNoOfOpenings());
+		jobRequest.setMinYearOfExp(jobRequestDto.getMinYearOfExp());
 
 		jobRequest.setLocation(jobRequestDto.getLocation());
 		jobRequest.setPayRange(jobRequestDto.getPayRange());
@@ -993,6 +995,7 @@ public class JobRequestServiceImpl implements JobRequestService {
 		jobRequestDto.setEmploymentType(jobRequest.getEmploymentType());
 		jobRequestDto.setContractDuration(jobRequest.getContractDuration());
 		jobRequestDto.setMonthOrYear(jobRequest.getMonthOrYear());
+		jobRequestDto.setMinYearOfExp(jobRequest.getMinYearOfExp());
 
 		jobRequestDto.setRequesterId(jobRequest.getRequesterId());
 		jobRequestDto.setRequesterName(CacheUtil.getUsersMap().get(jobRequest.getRequesterId()));

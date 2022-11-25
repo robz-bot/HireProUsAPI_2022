@@ -310,5 +310,19 @@ public class ProjectServiceImpl implements ProjectService {
 
 		return projectDtoList;
 	}
+
+	@Override
+	public List<ProjectDto> getProjectsByCustomerId(final String customerId) throws Exception {
+
+		List<Project> projectsList = projectRepository.findByCustomerId(Long.parseLong(customerId),
+				Sort.by(Sort.Direction.ASC, "projectName"));
+
+		List<ProjectDto> projectDtoList = new ArrayList<ProjectDto>();
+		for (Project project : projectsList) {
+			projectDtoList.add(this.getProjectDto(project));
+		}
+
+		return projectDtoList;
+	}
 	
 }

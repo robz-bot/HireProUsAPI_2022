@@ -34,6 +34,7 @@ import com.google.common.net.HttpHeaders;
 import com.promantus.hireprous.HireProUsConstants;
 import com.promantus.hireprous.dto.CandidateDto;
 import com.promantus.hireprous.dto.CandidatesCountDto;
+import com.promantus.hireprous.dto.EvaluateResumeDto;
 import com.promantus.hireprous.service.CandidateService;
 import com.promantus.hireprous.util.HireProUsUtil;
 
@@ -701,6 +702,20 @@ public class CandidateController extends CommonController {
 		}
 
 		return resultDto;
+	}
+	
+	@GetMapping("/getEvaluateResume/{jrNumber}/{candidateId}")
+	public EvaluateResumeDto getEvaluateResume(@PathVariable String jrNumber,
+			@PathVariable String candidateId,@RequestHeader(name = "lang", required = false) String lang) {
+
+		EvaluateResumeDto evaluateResumeDto = new EvaluateResumeDto();
+		try {
+			evaluateResumeDto = candidateService.getEvaluateResume(jrNumber,candidateId);
+		} catch (final Exception e) {
+			logger.error(HireProUsUtil.getErrorMessage(e));
+		}
+
+		return evaluateResumeDto;
 	}
 
 }

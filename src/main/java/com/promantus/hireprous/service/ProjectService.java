@@ -92,4 +92,6 @@ public interface ProjectService {
 
 	List<ProjectDto> getCustProjectBycustId(String custId) throws Exception;
 
+	List<ProjectDto> getProjectsByCustomerId(String customerId) throws Exception;
+
 }

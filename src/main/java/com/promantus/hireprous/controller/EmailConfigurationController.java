@@ -35,7 +35,6 @@ import com.promantus.hireprous.dto.EmailConfDto;
 import com.promantus.hireprous.service.EmailConfigurationService;
 import com.promantus.hireprous.util.HireProUsUtil;
 
-import io.swagger.annotations.ResponseHeader;
 
 /**
  * Controller class to handle Emails related APIs.
@@ -68,6 +67,10 @@ public class EmailConfigurationController extends CommonController {
 
 			// Mandatory check.
 			StringBuilder errorParam = new StringBuilder();
+			//To 
+			if (emailDto.getTo() == null || emailDto.getTo().isEmpty()) {
+				errorParam.append("To");
+			}
 			// Purpose.
 			if (emailDto.getPurpose() == null || emailDto.getPurpose().isEmpty()) {
 				errorParam.append("Purpose");
@@ -76,7 +79,7 @@ public class EmailConfigurationController extends CommonController {
 			if (emailDto.getBuId() == 0) {
 				errorParam.append(errorParam.length() > 0 ? ", BusinessUnit" : "BusinessUnit");
 			}
-			// To.
+//			// To.
 //			if (emailDto.getTo() == null || emailDto.getTo().isEmpty()) {
 //				errorParam.append(errorParam.length() > 0 ? ", To" : "To");
 //			}
@@ -134,9 +137,9 @@ public class EmailConfigurationController extends CommonController {
 				errorParam.append(errorParam.length() > 0 ? ", BusinessUnit" : "BusinessUnit");
 			}
 			// To.
-//			if (emailDto.getTo() == null || emailDto.getTo().isEmpty()) {
-//				errorParam.append(errorParam.length() > 0 ? ", To" : "To");
-//			}
+			if (emailDto.getTo() == null || emailDto.getPurpose().isEmpty()) {
+				errorParam.append(errorParam.length() > 0 ? ",To" : "To");
+			}
 //			// Cc.
 //			if (emailDto.getCc() == null || emailDto.getCc().isEmpty()) {
 //				errorParam.append(errorParam.length() > 0 ? ", Cc" : "Cc");

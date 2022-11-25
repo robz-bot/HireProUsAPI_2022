@@ -35,13 +35,19 @@ import com.promantus.hireprous.HireProUsDefaultMethods;
 import com.promantus.hireprous.dto.CandidateDto;
 import com.promantus.hireprous.dto.CandidateStatusDto;
 import com.promantus.hireprous.dto.CandidatesCountDto;
+import com.promantus.hireprous.dto.EvaluateResumeDto;
 import com.promantus.hireprous.dto.InterviewScheduleDto;
 import com.promantus.hireprous.dto.JobRequestDto;
 import com.promantus.hireprous.dto.ResumeDto;
 import com.promantus.hireprous.entity.Candidate;
+import com.promantus.hireprous.entity.EvaluateResume;
 import com.promantus.hireprous.entity.InterviewSchedule;
+import com.promantus.hireprous.entity.JobRequest;
+import com.promantus.hireprous.entity.RecruitmentRole;
 import com.promantus.hireprous.repository.CandidateRepository;
 import com.promantus.hireprous.repository.InterviewScheduleRepository;
+import com.promantus.hireprous.repository.JobRequestRepository;
+import com.promantus.hireprous.repository.RecruitmentRoleRepository;
 import com.promantus.hireprous.service.CandidateService;
 import com.promantus.hireprous.service.CommonService;
 import com.promantus.hireprous.service.ImageService;
@@ -61,6 +67,9 @@ import com.promantus.hireprous.util.HireProUsUtil;
 public class CandidateServiceImpl implements CandidateService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CandidateServiceImpl.class);
+	
+	@Autowired
+	RecruitmentRoleRepository recruitmentRepository;
 
 	@Autowired
 	CommonService commonService;
@@ -89,6 +98,10 @@ public class CandidateServiceImpl implements CandidateService {
 	@Autowired
 	CandidateRepository candidateRepository;
 
+	
+	@Autowired
+	JobRequestRepository jobRequestRepository;
+	
 	@Autowired
 	InterviewScheduleRepository interviewScheduleRepository;
 
@@ -139,6 +152,7 @@ public class CandidateServiceImpl implements CandidateService {
 		candidate.setExperience(candidateDto.getExperience());
 		candidate.setCurrentCompany(candidateDto.getCurrentCompany());
 		candidate.setCandidateType(candidateDto.getCandidateType());
+		candidate.setCurrentDesignation(candidateDto.getCurrentDesignation());
 
 		candidate.setRecStatus(HireProUsConstants.REC_STATUS_UPLOADED);
 
@@ -298,6 +312,7 @@ public class CandidateServiceImpl implements CandidateService {
 		candidate.setExperience(candidateDto.getExperience());
 		candidate.setCurrentCompany(candidateDto.getCurrentCompany());
 		candidate.setCandidateType(candidateDto.getCandidateType());
+		candidate.setCurrentDesignation(candidateDto.getCurrentDesignation());
 
 		candidate.setRecStatus(candidateDto.getRecStatus());
 
@@ -731,6 +746,7 @@ public class CandidateServiceImpl implements CandidateService {
 		candidateDto.setCandidateType(candidate.getCandidateType());
 
 		candidateDto.setRecStatus(candidate.getRecStatus());
+		candidateDto.setCurrentDesignation(candidate.getCurrentDesignation());
 
 		if (withImageResume) {
 			candidateDto.setImage(imageService.getImage(HireProUsConstants.CANDIDATE_IMAGE_PREFIX + candidate.getId()));
@@ -2308,4 +2324,39 @@ public class CandidateServiceImpl implements CandidateService {
 		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
 		return resultDto;
 	}
+
+	@Override
+	public EvaluateResumeDto getEvaluateResume(String jrNumber, String candidateId) {
+		
+		EvaluateResumeDto resultDto = new EvaluateResumeDto();
+		 
+		Candidate candidateDet = candidateRepository.findById(Long.parseLong(candidateId));
+		try {
+		if(candidateDet !=null) {
+			resultDto.setCandiDesig(candidateDet.getCurrentDesignation());
+			resultDto.setCandiId(candidateDet.getId());
+			resultDto.setCandiName(candidateDet.getFirstName() + " " + candidateDet.getLastName());
+			resultDto.setCandiSkillset(candidateDet.getSkillSet().replaceAll(",", " "));
+			resultDto.setCandiYOE(candidateDet.getExperience());
+		}
+		
+		JobRequest jobReqDet = jobRequestRepository.getJobRequestByReferenceNumber(jrNumber);
+		RecruitmentRole recRoleDet = recruitmentRepository.findById(jobReqDet.getRoleId());
+		
+		if(jobReqDet !=null) {
+			//resultDto.setCandiDesig(candidateDet.get);
+			resultDto.setJdDesig(recRoleDet.getRecruitmentRoleName());
+			resultDto.setJdNum(jrNumber);
+			resultDto.setJdSkillset(jobReqDet.getMandatorySkills() + " " +jobReqDet.getOptionalSkills());
+			resultDto.setJdYOE(jobReqDet.getMinYearOfExp());
+		}
+		}
+		catch(Exception E){
+			System.out.print(E);
+		}
+		return resultDto;
+		
+	}
+
+	
 }

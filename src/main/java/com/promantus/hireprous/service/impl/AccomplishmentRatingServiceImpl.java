@@ -220,11 +220,11 @@ public class AccomplishmentRatingServiceImpl implements AccomplishmentRatingServ
 	@Override
 	public byte[] downloadAccomplishReport(List<AccomplishmentRatingDto> accomplishmentRatingDtoList, String lang) throws IOException {
 		
-			File file = resourceLoader.getResource("classpath:excel-templates/accomplishment_Report.xlsx").getFile();
-			
-			try (Workbook accomplishmentReportWB = new XSSFWorkbook(file)) {
+			File file = resourceLoader.getResource("classpath:excel-templates/Accomplishment_Report.xlsx").getFile();
+			try (Workbook resourceAccomplishmentWB = new XSSFWorkbook(file)) {
 
-				Sheet sheet = accomplishmentReportWB.getSheetAt(0);
+				System.out.println("Size"+accomplishmentRatingDtoList.size());
+				Sheet sheet = resourceAccomplishmentWB.getSheetAt(0);
 				
 				HireProUsDefaultMethods.cleanSheet(sheet);
 				int rowNum = 2;
@@ -239,26 +239,25 @@ public class AccomplishmentRatingServiceImpl implements AccomplishmentRatingServ
 					dataRow.createCell(1).setCellValue(accomplishmentRatingDto.getResourceName());
 					dataRow.createCell(2).setCellValue(accomplishmentRatingDto.getBuName());
 					dataRow.createCell(3).setCellValue(accomplishmentRatingDto.getAchievements());
-					dataRow.createCell(4).setCellValue(accomplishmentRatingDto.getComments());
-					dataRow.createCell(5).setCellValue(accomplishmentRatingDto.getStatus());
-					dataRow.createCell(6).setCellValue(accomplishmentRatingDto.getRating());
-					dataRow.createCell(7).setCellValue(accomplishmentRatingDto.getRatingByname());
-					dataRow.createCell(8).setCellValue(accomplishmentRatingDto.getReviewedOn()==null? "-": accomplishmentRatingDto.getReviewedOn().toLocalDate().toString());
-					dataRow.createCell(9).setCellValue("");
+					dataRow.createCell(4).setCellValue(accomplishmentRatingDto.getStatus());
+					dataRow.createCell(5).setCellValue(accomplishmentRatingDto.getRating());
+					dataRow.createCell(6).setCellValue(accomplishmentRatingDto.getRatingByname());
+					dataRow.createCell(7).setCellValue(accomplishmentRatingDto.getReviewedOn()==null? "-": accomplishmentRatingDto.getReviewedOn().toLocalDate().toString());
+					dataRow.createCell(8).setCellValue("");
 
 					
 					rowNum++;
 				}
 
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-				accomplishmentReportWB.write(outputStream);
+				resourceAccomplishmentWB.write(outputStream);
 
-				accomplishmentReportWB.close();
+				resourceAccomplishmentWB.close();
 
 				return outputStream.toByteArray();
 
 			} catch (Exception ex) {
-				logger.error("Error during Accomplishment Report download file", ex);
+				logger.error("Error during Customer Details download file", ex);
 				return null;
 			}
       

@@ -105,9 +105,9 @@ public class ResourceMgmtServiceImpl implements ResourceMgmtService {
 		resourceMgmt.setEmploymentType(resourceMgmtDto.getEmploymentType());
 		resourceMgmt.setExperience(resourceMgmtDto.getExperience());
 
+		resourceMgmt.setCustomerId(resourceMgmtDto.getCustomerId());
 		resourceMgmt.setProjectId(resourceMgmtDto.getProjectId());
 		resourceMgmt.setBuId(resourceMgmtDto.getBuId());
-		resourceMgmt.setCustomerId(resourceMgmtDto.getCustomerId());
 
 		resourceMgmt.setResourceStatus(HireProUsConstants.RESOURCE_STATUS_ACTIVE);
 		resourceMgmt.setRemarks("Added");

@@ -245,4 +245,16 @@ public class ProjectController extends CommonController {
 
 		return projectsDtoList;
 	}
+	@GetMapping("/getProjectsByCustomerId/{custometId}")
+	public List<ProjectDto> getProjectsByCustomerId(@PathVariable String custometId,
+			@RequestHeader(name = "lang", required = false) String lang) {
+
+		try {
+			return projectService.getProjectsByCustomerId(custometId);
+		} catch (final Exception e) {
+			logger.error(HireProUsUtil.getErrorMessage(e));
+		}
+
+		return new ArrayList<ProjectDto>();
+	}
 }

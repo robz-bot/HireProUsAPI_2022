@@ -103,7 +103,8 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 			logger.info(resultDto.getMessage());
 			return resultDto;
 		}
-		if ( currentDate.getYear() == createdDate.getYear()) {
+		if (currentDate.getMonthValue() == createdDate.getMonthValue()
+				&& currentDate.getYear() == createdDate.getYear()) {
 
 			if (resourceAccomplishmentDto.getStatus().equalsIgnoreCase("open")) {
 				resourceAccomplishment.setResourceName(resourceAccomplishmentDto.getResourceName());

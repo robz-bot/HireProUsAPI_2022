@@ -4,12 +4,12 @@
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.promantus.hirepro</groupId>
-	<artifactId>hirepro</artifactId>
+	<groupId>com.promantus.hireprous</groupId>
+	<artifactId>hireprous</artifactId>
 	<version>0.0.1</version>
 	<packaging>war</packaging>
-	<name>Hirepro Webapp</name>
-	<description>Internal hiring portal of promantus.</description>
+	<name>Hireprous Webapp</name>
+	<description>Internal hiring web portal of promantus.</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -27,7 +27,6 @@
 	</properties>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
@@ -56,6 +55,17 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Add Monitoring -->
+		<!--<dependency> <groupId>de.codecentric</groupId> <artifactId>spring-boot-admin-starter-server</artifactId> 
+			<version>2.4.1</version> </dependency> <dependency> <groupId>de.codecentric</groupId> 
+			<artifactId>spring-boot-admin-starter-client</artifactId> <version>2.4.1</version> 
+			</dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>org.springframework.boot</groupId> -->
+		<!-- <artifactId>spring-boot-starter-actuator</artifactId> -->
+		<!-- </dependency> -->
 
 		<!-- Add Tomcat dependency -->
 		<dependency>
@@ -99,61 +109,34 @@
 			<version>2.7.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.microsoft.graph/microsoft-graph -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.microsoft.graph</groupId> -->
-<!-- 			<artifactId>microsoft-graph</artifactId> -->
-<!-- 			<version>3.2.0</version> -->
-<!-- 		</dependency> -->
-		<!-- https://mvnrepository.com/artifact/com.microsoft.graph/microsoft-graph-auth --> 
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.microsoft.graph</groupId> -->
-<!-- 			<artifactId>microsoft-graph-auth</artifactId> -->
-<!-- 			<version>0.2.0</version> -->
-<!-- 			<type>pom</type> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.8.0</version>
+		</dependency>
 
-<!-- 		 https://mvnrepository.com/artifact/com.microsoft.azure/msal4j --> 
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.microsoft.azure</groupId> -->
-<!-- 			<artifactId>msal4j</artifactId> -->
-<!-- 			<version>1.10.0</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>4.0.1</version>
+		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.squareup.okhttp3</groupId> -->
-<!-- 			<artifactId>okhttp</artifactId> -->
-<!-- 			<version>4.9.1</version> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.jetbrains.kotlin</groupId> -->
-<!-- 			<artifactId>kotlin-stdlib</artifactId> -->
-<!-- 			<version>1.3.70</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>4.0.1</version>
+		</dependency>
 
-<!-- 		 https://mvnrepository.com/artifact/io.projectreactor.netty/reactor-netty --> 
-<!-- 		<dependency> -->
-<!-- 			<groupId>io.projectreactor.netty</groupId> -->
-<!-- 			<artifactId>reactor-netty</artifactId> -->
-<!-- 			<version>1.0.8</version> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>io.netty</groupId> -->
-<!-- 			<artifactId>netty-handler</artifactId> -->
-<!-- 			<version>4.1.48.Final</version> -->
-<!-- 		</dependency> -->
-<!-- 		 Thanks for using https://jar-download.com --> 
-<!-- 		https://mvnrepository.com/artifact/io.projectreactor/reactor-core --> 
-<!-- 		<dependency> -->
-<!-- 			<groupId>io.projectreactor</groupId> -->
-<!-- 			<artifactId>reactor-core</artifactId> -->
-<!-- 			<version>3.4.5</version> -->
-<!-- 		</dependency> -->
-
+		<dependency>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<version>4.2.2</version>
+		</dependency>
 
 	</dependencies>
 
 	<build>
+		<finalName>hireprous</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -162,6 +145,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<nonFilteredFileExtensions>
+						<nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
+					</nonFilteredFileExtensions>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

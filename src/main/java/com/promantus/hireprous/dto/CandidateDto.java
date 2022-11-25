@@ -4,22 +4,12 @@
  **********************************************************************************************/
 package com.promantus.hireprous.dto;
 
-import java.io.Serializable;
+
 import java.time.LocalDateTime;
 
-/**
- * Entity class for the MongoDB collection - users.
- * 
- * @author Sihab.
- *
- */
-public class CandidateDto implements Serializable {
+public class CandidateDto  {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
+	
 	private Long id;
 	private String jrNumber;
 	private String email;
@@ -32,6 +22,7 @@ public class CandidateDto implements Serializable {
 	private String experience;
 	private String currentCompany;
 	private String candidateType;
+	private String currentDesignation;
 
 	private String recStatus;
 	private String recStatusDisplay;
@@ -647,4 +638,14 @@ public class CandidateDto implements Serializable {
 	public void setToDateTime(LocalDateTime toDateTime) {
 		this.toDateTime = toDateTime;
 	}
+
+	public String getCurrentDesignation() {
+		return currentDesignation;
+	}
+
+	public void setCurrentDesignation(String currentDesignation) {
+		this.currentDesignation = currentDesignation;
+	}
+	
+	
 }
