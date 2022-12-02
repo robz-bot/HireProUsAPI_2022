@@ -4,9 +4,12 @@
  **********************************************************************************************/
 package com.promantus.hireprous.config;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +18,7 @@ import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.service.Parameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -28,7 +32,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
-	private final String releaseVersion = "3.0.4";
+	private final String releaseVersion = "4.0.0";
+
+	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+	LocalDateTime now = LocalDateTime.now();
+
+	
+	@Value("${ui.server.url}")
+	private String url;
 
 	@Bean
 	public Docket hireProApi() {
@@ -41,11 +52,11 @@ public class SwaggerConfig {
 	 * @return
 	 */
 	private ApiInfo metaData() {
-		return new ApiInfoBuilder().title("HireProUs - Spring Boot REST API - " + releaseVersion)
+		return new ApiInfoBuilder().title("HireProUs - Spring Boot REST API - " + releaseVersion + " (" + dtf.format(now) + ")")
 				.description("\"An internal hiring web application of Promantus Private Limited, Chennai.\"")
 				.version(releaseVersion)
-//				.license("Promantus License Version 1.0").licenseUrl("https://promantusinc.com/licenses/LICENSE-1.0\"")
-//				.contact(new Contact("Kamal Purushothaman", "https://promantusinc.com/", "kamal@promantusinc.com"))
+				.license("Promantus Inc License Version 1.0").licenseUrl("https://promantusinc.com")
+				.contact(new Contact("Robin Rajesh", url , "robinrajesh@promantus.com"))
 				.build();
 	}
 

@@ -35,7 +35,7 @@ public class ResourceMgmtDto implements Serializable {
 	private String projectAllocation;
 	private long projectId;
 	private String projectName;
-	private Long buId;
+	private long buId;
 	private String buName;
 	private long customerId;
 	private String customerName;
