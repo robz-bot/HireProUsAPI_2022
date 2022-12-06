@@ -541,16 +541,41 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 	public void updateShortlistedResult(final InterviewScheduleDto interviewScheduleDto, final String lang)
 			throws Exception {
 
-		InterviewSchedule interviewSchedule = interviewScheduleRepository.findByJrNumberAndCandidateIdAndRound(
+		InterviewSchedule interviewSchedule = new InterviewSchedule();
+		interviewSchedule = interviewScheduleRepository.findByJrNumberAndCandidateIdAndRound(
 				interviewScheduleDto.getJrNumber(), interviewScheduleDto.getCandidateId(), 0);
 
-		interviewSchedule.setRecStatus(interviewScheduleDto.getRecStatus());
-		interviewSchedule.setResultRemarks(interviewScheduleDto.getResultRemarks());
+		if (interviewSchedule != null) {
 
-		interviewSchedule.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
-		interviewSchedule.setUpdatedDateTime(LocalDateTime.now());
+			interviewSchedule.setRecStatus(interviewScheduleDto.getRecStatus());
+			interviewSchedule.setResultRemarks(interviewScheduleDto.getResultRemarks());
 
-		interviewScheduleRepository.save(interviewSchedule);
+			interviewSchedule.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
+			interviewSchedule.setUpdatedDateTime(LocalDateTime.now());
+
+			interviewScheduleRepository.save(interviewSchedule);
+		} else {
+			InterviewSchedule interviewScheduleNew = new InterviewSchedule();
+
+			interviewScheduleNew.setId(commonService.nextSequenceNumber());
+			interviewScheduleNew.setRecStatus(interviewScheduleDto.getRecStatus());
+			interviewScheduleNew.setRound(1);
+			interviewScheduleNew.setResultRemarks(interviewScheduleDto.getResultRemarks());
+			interviewScheduleNew.setCandidateId(interviewScheduleDto.getCandidateId());
+			interviewScheduleNew.setInterviewerId(interviewScheduleDto.getCreatedBy());
+			interviewScheduleNew.setDuration("0");
+			interviewScheduleNew.setScheduleDateTime(LocalDateTime.now());
+			interviewScheduleNew.setMode("Remote");
+			interviewScheduleNew.setVenue("System");
+			interviewScheduleNew.setCompleted(0);
+			interviewScheduleNew.setCreatedBy(interviewScheduleDto.getCreatedBy());
+			interviewScheduleNew.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
+			interviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
+			interviewScheduleNew.setCreatedDateTime(LocalDateTime.now());
+			interviewScheduleNew.setJrNumber(interviewScheduleDto.getJrNumber());
+
+			interviewScheduleRepository.save(interviewScheduleNew);
+		}
 	}
 
 	@Override
@@ -1054,7 +1079,6 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 		interviewScheduleDto.setLocation(jobRequestDto.getLocation());
 		interviewScheduleDto.setEmploymentType(jobRequestDto.getEmploymentType());
 		interviewScheduleDto.setPlacementFor(jobRequestDto.getPlacementFor());
-		
 
 		CandidateDto candidateDto = candidateService.getCandidateById(interviewSchedule.getCandidateId() + "");
 		if (candidateDto == null
@@ -1067,8 +1091,7 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 				VendorDto vendor = vendorService.getVendorById((candidateDto.getVendorId().toString()));
 				interviewScheduleDto.setCreatedByName(vendor.getVendorName());
 
-			}
-			else {
+			} else {
 				interviewScheduleDto.setCreatedByName(CacheUtil.getUsersMap().get(interviewSchedule.getCreatedBy()));
 			}
 		} else {
@@ -1181,7 +1204,7 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 				dataRow.createCell(13).setCellValue(this.getRoundName(interviewScheduleDto.getRound()));
 
 				dataRow.createCell(14).setCellValue(interviewScheduleDto.getResultRemarks());
-			
+
 				dataRow.createCell(15).setCellValue(interviewScheduleDto.getUpdatedByName());
 
 				dataRow.createCell(16).setCellValue(interviewScheduleDto.getUpdatedDateTime().toLocalDate().toString());
@@ -1277,7 +1300,7 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 		}
 
 		if (interviewScheduleDto.getInterviewerName() != null && !interviewScheduleDto.getInterviewerName().isEmpty()) {
-		List<Long> interviewerIds = userService.searchUsersIdsByName(interviewScheduleDto.getInterviewerName());
+			List<Long> interviewerIds = userService.searchUsersIdsByName(interviewScheduleDto.getInterviewerName());
 			if (interviewerIds != null && interviewerIds.size() > 0) {
 				criteriaList.add(Criteria.where("interviewerId").in(interviewerIds));
 			} else {
