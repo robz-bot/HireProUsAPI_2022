@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -26,7 +25,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-
 import com.promantus.hireprous.HireProUsConstants;
 import com.promantus.hireprous.HireProUsDefaultMethods;
 import com.promantus.hireprous.dto.CandidateDto;
@@ -52,59 +50,44 @@ import com.promantus.hireprous.util.HireProUsUtil;
  */
 @Service
 public class InterviewScheduleServiceImpl implements InterviewScheduleService {
-
 	private static final Logger logger = LoggerFactory.getLogger(InterviewScheduleServiceImpl.class);
-
 	@Autowired
 	CommonService commonService;
-
 	@Autowired
 	MongoTemplate mongoTemplate;
-
 	@Autowired
 	MailService mailService;
-
 	@Autowired
 	JobRequestService jobRequestService;
-
 	@Autowired
 	CandidateService candidateService;
-
 	@Autowired
 	VendorService vendorService;
-
 	@Autowired
 	InterviewScheduleRepository interviewScheduleRepository;
-
 	@Autowired
 	UserService userService;
-
 	@Autowired
 	ResourceLoader resourceLoader;
 
 	@Override
 	public InterviewScheduleDto addInterviewSchedule(final InterviewScheduleDto interviewScheduleDto, String lang)
 			throws Exception {
-
 		InterviewScheduleDto resultDto = new InterviewScheduleDto();
 		LocalDateTime newStartDateTime = interviewScheduleDto.getScheduleDateTime();
 		String newHourMinute = HireProUsUtil.getHourMinute(interviewScheduleDto.getDuration());
 		LocalDateTime newEndDateTime = interviewScheduleDto.getScheduleDateTime()
 				.plusHours(Long.parseLong(newHourMinute.split(",")[0]))
 				.plusMinutes(Long.parseLong(newHourMinute.split(",")[1]));
-
 		List<InterviewSchedule> interviewScheduleList = interviewScheduleRepository
 				.findByInterviewerIdAndResultRemarksNull(interviewScheduleDto.getInterviewerId());
-
 		boolean alreadyScheduled = false;
 		for (InterviewSchedule interviewSchedule : interviewScheduleList) {
-
 			String hourMinute = HireProUsUtil.getHourMinute(interviewSchedule.getDuration());
 			LocalDateTime startDateTime = interviewSchedule.getScheduleDateTime();
 			LocalDateTime endDateTime = interviewSchedule.getScheduleDateTime()
 					.plusHours(Long.parseLong(hourMinute.split(",")[0]))
 					.plusMinutes(Long.parseLong(hourMinute.split(",")[1]));
-
 			if (newStartDateTime.equals(startDateTime) || newEndDateTime.equals(endDateTime)
 					|| (newStartDateTime.isAfter(startDateTime) && newStartDateTime.isBefore(endDateTime))
 					|| newEndDateTime.isAfter(startDateTime) && newEndDateTime.isBefore(endDateTime)
@@ -114,18 +97,14 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 			}
 		}
 		if (alreadyScheduled) {
-
 			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 			resultDto.setMessage(commonService.getMessage("already.exists.interview",
 					new String[] { CacheUtil.getUsersMap().get(interviewScheduleDto.getInterviewerId()) }, lang));
-
 			logger.info(resultDto.getMessage());
 			return resultDto;
 		}
-
 		InterviewSchedule interviewSchedule = new InterviewSchedule();
 		interviewSchedule.setId(commonService.nextSequenceNumber());
-
 		interviewSchedule.setJrNumber(interviewScheduleDto.getJrNumber());
 		interviewSchedule.setCandidateId(interviewScheduleDto.getCandidateId());
 		interviewSchedule.setInterviewerId(interviewScheduleDto.getInterviewerId());
@@ -133,22 +112,16 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 		interviewSchedule.setTimeZone(interviewScheduleDto.getTimeZone());
 		interviewSchedule.setDuration(interviewScheduleDto.getDuration());
 		interviewSchedule.setScheduleRemarks(interviewScheduleDto.getScheduleRemarks());
-
 		interviewSchedule.setMode(interviewScheduleDto.getMode());
 		interviewSchedule.setVenue(interviewScheduleDto.getVenue());
-
 		interviewSchedule.setRecStatus(interviewScheduleDto.getRecStatus());
 		interviewSchedule.setRound(interviewScheduleDto.getRound());
-
 		interviewSchedule.setCreatedBy(interviewScheduleDto.getCreatedBy());
 		interviewSchedule.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
 		interviewSchedule.setCreatedDateTime(LocalDateTime.now());
 		interviewSchedule.setUpdatedDateTime(LocalDateTime.now());
-
 		interviewScheduleRepository.save(interviewSchedule);
-
 		this.updateCompletedPreviousRound(interviewScheduleDto);
-
 		if (interviewScheduleDto.getRound() != HireProUsConstants.INTERVIEW_ROUND_INITIAL
 				&& interviewScheduleDto.getRound() != HireProUsConstants.INTERVIEW_ROUND_BU) {
 			// Send Scheduled Mail.
@@ -158,14 +131,12 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 					try {
 						mailService.sendInterviewScheduledEmail(interviewScheduleDto, interviewSchedule);
 					} catch (Exception e) {
-
 						logger.error("Email for Interview Scheduled is not Sent.");
 						logger.error(HireProUsUtil.getErrorMessage(e));
 					}
 				}
 			}).start();
 		}
-
 		resultDto.setId(interviewSchedule.getId());
 		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
 		return resultDto;
@@ -176,49 +147,38 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 	 * @throws Exception
 	 */
 	private void updateCompletedPreviousRound(InterviewScheduleDto interviewScheduleDto) throws Exception {
-
 		int round = interviewScheduleDto.getRound();
 		// 3 - customer
 		if (round == 3) {
 			JobRequestDto jobRequestDto = jobRequestService
 					.getJobRequestInfoByJRNumber(interviewScheduleDto.getJrNumber());
-
 			if (jobRequestDto != null && !jobRequestDto.getPlacementFor().isEmpty()
 					&& jobRequestDto.getPlacementFor().equals(HireProUsConstants.PLACEMENT_FOR_CUSTOMER)) {
 				round = 2;
 			}
 			// 4 - HR
 		} else if (round == 4) {
-
 			JobRequestDto jobRequestDto = jobRequestService
 					.getJobRequestInfoByJRNumber(interviewScheduleDto.getJrNumber());
-
 			if (jobRequestDto != null && !jobRequestDto.getPlacementFor().isEmpty()
 					&& jobRequestDto.getPlacementFor().equals(HireProUsConstants.PLACEMENT_FOR_INTERNAL)) {
 				round = 3;
 			}
 			// 5 - BU approval
 		} else if (round == 5) {
-
 			CandidateDto candidateDto = candidateService
 					.getCandidateShortInfoById(interviewScheduleDto.getCandidateId() + "");
-
 			if (candidateDto != null && !candidateDto.getCandidateType().isEmpty()
 					&& candidateDto.getCandidateType().equals(HireProUsConstants.CANDIDATE_TYPE_INTERNAL)) {
 				round = 4;
 			}
 		}
-
 		InterviewSchedule interviewScheduleOld = interviewScheduleRepository.findByJrNumberAndCandidateIdAndRound(
 				interviewScheduleDto.getJrNumber(), interviewScheduleDto.getCandidateId(), round - 1);
-
 		if (interviewScheduleOld != null) {
-
 			interviewScheduleOld.setCompleted(1);
-
 //			interviewScheduleOld.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
 //			interviewScheduleOld.setUpdatedDateTime(LocalDateTime.now());
-
 			interviewScheduleRepository.save(interviewScheduleOld);
 		}
 	}
@@ -226,57 +186,41 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 	@Override
 	public InterviewScheduleDto updateInterviewSchedule(final InterviewScheduleDto interviewScheduleDto,
 			final String lang) throws Exception {
-
 		InterviewScheduleDto resultDto = new InterviewScheduleDto();
-
 		InterviewSchedule interviewSchedule = interviewScheduleRepository.findById(interviewScheduleDto.getId());
-
 		if (interviewSchedule == null) {
-
 			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 			resultDto.setMessage(commonService.getMessage("invalid", new String[] { "InterviewSchedule Id" }, lang));
-
 			logger.info(resultDto.getMessage());
 			return resultDto;
 		}
-
 		LocalDateTime newStartDateTime = interviewScheduleDto.getScheduleDateTime();
 		String newHourMinute = HireProUsUtil.getHourMinute(interviewScheduleDto.getDuration());
 		LocalDateTime newEndDateTime = interviewScheduleDto.getScheduleDateTime()
 				.plusHours(Long.parseLong(newHourMinute.split(",")[0]))
 				.plusMinutes(Long.parseLong(newHourMinute.split(",")[1]));
-
 		List<InterviewSchedule> interviewScheduleList = interviewScheduleRepository
 				.findByInterviewerIdAndResultRemarksNull(interviewScheduleDto.getInterviewerId());
-
 		InterviewSchedule interScheduleList = interviewScheduleRepository.findByInterviewerIdAndScheduleDateTime(
 				interviewScheduleDto.getInterviewerId(), interviewScheduleDto.getScheduleDateTime());
-
 		// added on 11/23/2021 Not able to Update the schedule
 		if (interScheduleList != null) {
 			interviewSchedule.setScheduleRemarks(interviewScheduleDto.getScheduleRemarks());
-
 			interviewSchedule.setMode(interviewScheduleDto.getMode());
 			interviewSchedule.setVenue(interviewScheduleDto.getVenue());
-
 			interviewSchedule.setRecStatus(interviewScheduleDto.getRecStatus());
 			interviewSchedule.setRound(interviewScheduleDto.getRound());
-
 			interviewSchedule.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
 			interviewSchedule.setUpdatedDateTime(LocalDateTime.now());
-
 			interviewScheduleRepository.save(interviewSchedule);
 		}
-
 		boolean alreadyScheduled = false;
 		for (InterviewSchedule interviewScheduleCheck : interviewScheduleList) {
-
 			String hourMinute = HireProUsUtil.getHourMinute(interviewScheduleCheck.getDuration());
 			LocalDateTime startDateTime = interviewScheduleCheck.getScheduleDateTime();
 			LocalDateTime endDateTime = interviewScheduleCheck.getScheduleDateTime()
 					.plusHours(Long.parseLong(hourMinute.split(",")[0]))
 					.plusMinutes(Long.parseLong(hourMinute.split(",")[1]));
-
 			if (newStartDateTime.equals(startDateTime) || newEndDateTime.equals(endDateTime)
 					|| (newStartDateTime.isAfter(startDateTime) && newStartDateTime.isBefore(endDateTime))
 					|| newEndDateTime.isAfter(startDateTime) && newEndDateTime.isBefore(endDateTime)
@@ -286,18 +230,14 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 					break;
 				}
 			}
-
 		}
 		if (alreadyScheduled) {
-
 			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 			resultDto.setMessage(commonService.getMessage("already.exists.interview",
 					new String[] { CacheUtil.getUsersMap().get(interviewScheduleDto.getInterviewerId()) }, lang));
-
 			logger.info(resultDto.getMessage());
 			return resultDto;
 		}
-
 		interviewSchedule.setJrNumber(interviewScheduleDto.getJrNumber());
 		interviewSchedule.setCandidateId(interviewScheduleDto.getCandidateId());
 		interviewSchedule.setInterviewerId(interviewScheduleDto.getInterviewerId());
@@ -305,18 +245,13 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 		interviewSchedule.setTimeZone(interviewScheduleDto.getTimeZone());
 		interviewSchedule.setDuration(interviewScheduleDto.getDuration());
 		interviewSchedule.setScheduleRemarks(interviewScheduleDto.getScheduleRemarks());
-
 		interviewSchedule.setMode(interviewScheduleDto.getMode());
 		interviewSchedule.setVenue(interviewScheduleDto.getVenue());
-
 		interviewSchedule.setRecStatus(interviewScheduleDto.getRecStatus());
 		interviewSchedule.setRound(interviewScheduleDto.getRound());
-
 		interviewSchedule.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
 		interviewSchedule.setUpdatedDateTime(LocalDateTime.now());
-
 		interviewScheduleRepository.save(interviewSchedule);
-
 		if (interviewScheduleDto.getRound() != HireProUsConstants.INTERVIEW_ROUND_INITIAL
 				&& interviewScheduleDto.getRound() != HireProUsConstants.INTERVIEW_ROUND_BU) {
 			// Send Schedule Updated Mail.
@@ -326,14 +261,12 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 					try {
 						mailService.sendInterviewScheduleUpdatedEmail(interviewScheduleDto, interviewSchedule);
 					} catch (Exception e) {
-
 						logger.error("Email for Interview Schedule Update is not Sent.");
 						logger.error(HireProUsUtil.getErrorMessage(e));
 					}
 				}
 			}).start();
 		}
-
 		resultDto.setId(interviewSchedule.getId());
 		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
 		return resultDto;
@@ -342,65 +275,45 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 	@Override
 	public InterviewScheduleDto updateResult(final InterviewScheduleDto interviewScheduleDto, final String lang)
 			throws Exception {
-
 		InterviewScheduleDto resultDto = new InterviewScheduleDto();
-
 		InterviewSchedule interviewSchedule = interviewScheduleRepository.findById(interviewScheduleDto.getId());
-
 		if (interviewSchedule == null) {
-
 			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 			resultDto.setMessage(commonService.getMessage("invalid", new String[] { "InterviewSchedule Id" }, lang));
-
 			logger.info(resultDto.getMessage());
 			return resultDto;
 		}
-
 		if (HireProUsConstants.REC_STATUS_PASSED_R1.equals(interviewScheduleDto.getRecStatus())) {
-
 			JobRequestDto jobRequestDto = jobRequestService
 					.getJobRequestInfoByJRNumber(interviewSchedule.getJrNumber());
-
 			if (jobRequestDto != null && !jobRequestDto.getPlacementFor().isEmpty()
 					&& jobRequestDto.getPlacementFor().equals(HireProUsConstants.PLACEMENT_FOR_CUSTOMER)) {
 				interviewScheduleDto.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_R2);
 			}
-
 		} else if (HireProUsConstants.REC_STATUS_PASSED_R2.equals(interviewScheduleDto.getRecStatus())) {
-
 			JobRequestDto jobRequestDto = jobRequestService
 					.getJobRequestInfoByJRNumber(interviewSchedule.getJrNumber());
-
 			if (jobRequestDto != null && !jobRequestDto.getPlacementFor().isEmpty()
 					&& jobRequestDto.getPlacementFor().equals(HireProUsConstants.PLACEMENT_FOR_INTERNAL)) {
 				interviewScheduleDto.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_CR3);
 			}
-
 		} else if (HireProUsConstants.REC_STATUS_PASSED_CR3.equals(interviewScheduleDto.getRecStatus())) {
-
 			CandidateDto candidateDto = candidateService
 					.getCandidateShortInfoById(interviewSchedule.getCandidateId() + "");
-
 			if (candidateDto != null && !candidateDto.getCandidateType().isEmpty()
 					&& candidateDto.getCandidateType().equals(HireProUsConstants.CANDIDATE_TYPE_INTERNAL)) {
 				interviewScheduleDto.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_HR4);
 			}
 		}
-
 		interviewSchedule.setRecStatus(interviewScheduleDto.getRecStatus());
 		interviewSchedule.setResultRemarks(interviewScheduleDto.getResultRemarks());
-
 		interviewSchedule.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
 		interviewSchedule.setUpdatedDateTime(LocalDateTime.now());
-
 		interviewScheduleRepository.save(interviewSchedule);
-
 		if (HireProUsConstants.REC_STATUS_PASSED_HR4.equals(interviewScheduleDto.getRecStatus())) {
-
 			// Update in Interview schedule for BU approval.
 			InterviewSchedule interviewScheduleNew = new InterviewSchedule();
 			interviewScheduleNew.setId(commonService.nextSequenceNumber());
-
 			interviewScheduleNew.setJrNumber(interviewSchedule.getJrNumber());
 			interviewScheduleNew.setCandidateId(interviewSchedule.getCandidateId());
 			interviewScheduleNew.setInterviewerId(interviewSchedule.getCreatedBy());
@@ -408,33 +321,25 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 			interviewScheduleNew.setTimeZone(interviewScheduleDto.getTimeZone());
 			interviewScheduleNew.setDuration("0");
 			interviewScheduleNew.setScheduleRemarks("For Approval by BU");
-
 			interviewScheduleNew.setMode(interviewScheduleDto.getMode());
 			interviewScheduleNew.setVenue(interviewScheduleDto.getVenue());
-
 			interviewScheduleNew.setRecStatus(HireProUsConstants.REC_STATUS_SCHEDULED_BU);
 			interviewScheduleNew.setRound(HireProUsConstants.INTERVIEW_ROUND_BU);
-
 			interviewScheduleNew.setCreatedBy(interviewSchedule.getCreatedBy());
 			interviewScheduleNew.setUpdatedBy(interviewSchedule.getUpdatedBy());
 			interviewScheduleNew.setCreatedDateTime(LocalDateTime.now());
 			interviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
-
 			interviewScheduleRepository.save(interviewScheduleNew);
 		}
-
 		// Update status in candidate.
 		if (interviewScheduleDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_APPROVED_BU)) {
 			interviewScheduleDto.setRecStatus(HireProUsConstants.REC_STATUS_SELECTED);
 		}
-
 		candidateService.updateRecStatus(interviewSchedule.getCandidateId(), interviewScheduleDto.getRecStatus(),
 				interviewScheduleDto.getUpdatedBy());
-
 		// If candidate is approved by BU, increment the closed openings.
 		if (interviewScheduleDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_SELECTED)) {
 			jobRequestService.updateClosedOpening(interviewSchedule.getJrNumber());
-
 			CandidateDto candidateDto = candidateService.getCandidateById(interviewSchedule.getCandidateId() + "");
 			// Send Selected Mail.
 			new Thread(new Runnable() {
@@ -443,17 +348,14 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 					try {
 						mailService.sendBUResultEmail(candidateDto, "Selected");
 					} catch (Exception e) {
-
 						logger.error("Email for Selected is not Sent.");
 						logger.error(HireProUsUtil.getErrorMessage(e));
 					}
 				}
 			}).start();
 		}
-
 		// If candidate is hold by BU.
 		if (interviewScheduleDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_HOLDED_BU)) {
-
 			CandidateDto candidateDto = candidateService.getCandidateById(interviewSchedule.getCandidateId() + "");
 			// Send Hold by BU Mail.
 			new Thread(new Runnable() {
@@ -462,17 +364,14 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 					try {
 						mailService.sendBUResultEmail(candidateDto, "Hold");
 					} catch (Exception e) {
-
 						logger.error("Email for Hold by BU is not Sent.");
 						logger.error(HireProUsUtil.getErrorMessage(e));
 					}
 				}
 			}).start();
 		}
-
 		// If candidate is rejected by BU.
 		if (interviewScheduleDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_REJECTED_BU)) {
-
 			CandidateDto candidateDto = candidateService.getCandidateById(interviewSchedule.getCandidateId() + "");
 			// Send Rejected by BU Mail.
 			new Thread(new Runnable() {
@@ -481,14 +380,12 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 					try {
 						mailService.sendBUResultEmail(candidateDto, "Rejected");
 					} catch (Exception e) {
-
 						logger.error("Email for Rejected by BU is not Sent.");
 						logger.error(HireProUsUtil.getErrorMessage(e));
 					}
 				}
 			}).start();
 		}
-
 		// send Mail for Interview Result
 		interviewScheduleDto.setUpdatedDateTime(interviewSchedule.getUpdatedDateTime());
 		interviewScheduleDto.setInterviewerId(interviewSchedule.getInterviewerId());
@@ -505,17 +402,14 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 					try {
 						mailService.sendInterviewResultEmail(interviewScheduleDto);
 					} catch (Exception e) {
-
 						logger.error("Email for Interview Result is not Sent.");
 						logger.error(HireProUsUtil.getErrorMessage(e));
 					}
 				}
 			}).start();
 		}
-
 		// Send For BU Approval Email.
 		if (HireProUsConstants.REC_STATUS_PASSED_HR4.equals(interviewScheduleDto.getRecStatus())) {
-
 			CandidateDto candidateDto = candidateService.getCandidateById(interviewScheduleDto.getCandidateId() + "");
 			// Send For BU Approval Mail.
 			new Thread(new Runnable() {
@@ -524,14 +418,12 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 					try {
 						mailService.sendForBUApprovalEmail(candidateDto);
 					} catch (Exception e) {
-
 						logger.error("Email for For BU Approval is not Sent.");
 						logger.error(HireProUsUtil.getErrorMessage(e));
 					}
 				}
 			}).start();
 		}
-
 		resultDto.setId(interviewSchedule.getId());
 		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
 		return resultDto;
@@ -541,41 +433,16 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 	public void updateShortlistedResult(final InterviewScheduleDto interviewScheduleDto, final String lang)
 			throws Exception {
 
-		InterviewSchedule interviewSchedule = new InterviewSchedule();
-		interviewSchedule = interviewScheduleRepository.findByJrNumberAndCandidateIdAndRound(
+		InterviewSchedule interviewSchedule = interviewScheduleRepository.findByJrNumberAndCandidateIdAndRound(
 				interviewScheduleDto.getJrNumber(), interviewScheduleDto.getCandidateId(), 0);
 
-		if (interviewSchedule != null) {
+		interviewSchedule.setRecStatus(interviewScheduleDto.getRecStatus());
+		interviewSchedule.setResultRemarks(interviewScheduleDto.getResultRemarks());
 
-			interviewSchedule.setRecStatus(interviewScheduleDto.getRecStatus());
-			interviewSchedule.setResultRemarks(interviewScheduleDto.getResultRemarks());
+		interviewSchedule.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
+		interviewSchedule.setUpdatedDateTime(LocalDateTime.now());
 
-			interviewSchedule.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
-			interviewSchedule.setUpdatedDateTime(LocalDateTime.now());
-
-			interviewScheduleRepository.save(interviewSchedule);
-		} else {
-			InterviewSchedule interviewScheduleNew = new InterviewSchedule();
-
-			interviewScheduleNew.setId(commonService.nextSequenceNumber());
-			interviewScheduleNew.setRecStatus(interviewScheduleDto.getRecStatus());
-			interviewScheduleNew.setRound(1);
-			interviewScheduleNew.setResultRemarks(interviewScheduleDto.getResultRemarks());
-			interviewScheduleNew.setCandidateId(interviewScheduleDto.getCandidateId());
-			interviewScheduleNew.setInterviewerId(interviewScheduleDto.getCreatedBy());
-			interviewScheduleNew.setDuration("0");
-			interviewScheduleNew.setScheduleDateTime(LocalDateTime.now());
-			interviewScheduleNew.setMode("Remote");
-			interviewScheduleNew.setVenue("System");
-			interviewScheduleNew.setCompleted(0);
-			interviewScheduleNew.setCreatedBy(interviewScheduleDto.getCreatedBy());
-			interviewScheduleNew.setUpdatedBy(interviewScheduleDto.getUpdatedBy());
-			interviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
-			interviewScheduleNew.setCreatedDateTime(LocalDateTime.now());
-			interviewScheduleNew.setJrNumber(interviewScheduleDto.getJrNumber());
-
-			interviewScheduleRepository.save(interviewScheduleNew);
-		}
+		interviewScheduleRepository.save(interviewSchedule);
 	}
 
 	@Override
@@ -598,8 +465,12 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 	@Override
 	public List<InterviewScheduleDto> getViewHistory(String jrNumber, Long candidateId, String lang) throws Exception {
 
+//		List<InterviewSchedule> interviewSchedulesList = interviewScheduleRepository
+//				.findByJrNumberAndCandidateId(jrNumber, candidateId, HireProUsUtil.orderByCreatedDateTimeAsc());
+		
+		// Added on 29-12-2022 for view history not working in AI Scan
 		List<InterviewSchedule> interviewSchedulesList = interviewScheduleRepository
-				.findByJrNumberAndCandidateId(jrNumber, candidateId, HireProUsUtil.orderByCreatedDateTimeAsc());
+                .findByJrNumberAndCandidateId(jrNumber, candidateId, HireProUsUtil.orderByIdAsc());
 
 		List<InterviewScheduleDto> interviewScheduleDtoList = new ArrayList<InterviewScheduleDto>();
 		int index = 0;

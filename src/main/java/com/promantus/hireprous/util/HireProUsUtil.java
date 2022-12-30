@@ -66,6 +66,11 @@ public final class HireProUsUtil {
 		return Sort.by(Sort.Direction.DESC, "createdDateTime");
 	}
 
+	//Added for candidate History
+	public static Sort orderByIdAsc() {
+		return Sort.by(Sort.Direction.ASC, "_id");
+	}
+
 	/**
 	 * @return
 	 */

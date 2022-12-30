@@ -94,8 +94,14 @@ public class LoginServiceImpl implements LoginService {
 		resultDto.setFullName(user.getFirstName() + " " + user.getLastName());
 		resultDto.setDesignation(user.getDesignation());
 
+		resultDto.setManagerId(user.getManagerId());
+		resultDto.setManagerName(userRepository.findById(user.getManagerId()).getFirstName() + " "
+				+ userRepository.findById(user.getManagerId()).getLastName());
+
 		resultDto.setBusinessUnitId(user.getBusinessUnitId());
 		resultDto.setBusinessUnitName(businessUnitService.getBusinessUnitNameById(user.getBusinessUnitId()));
+		
+		resultDto.setMessage("Logged In Success");;
 
 		resultDto.setRoleId(user.getRoleId());
 		resultDto.setRoleName(roleService.getRoleNameById(user.getRoleId()));
