@@ -25,9 +25,9 @@ import com.promantus.hireprous.util.HireProUsUtil;
 @RestController
 @RequestMapping("/api/v1")
 public class ResourceAccomplishmentController extends CommonController {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(JobRequestController.class);
- 
+
 	@Autowired
 	private ResourceAccomplishmentService resourceAccomplishmentService;
 
@@ -35,29 +35,30 @@ public class ResourceAccomplishmentController extends CommonController {
 	private String downloadsPath;
 
 	@PostMapping("/addResourceAccomplishment")
-	public ResourceAccomplishmentDto addResourceAccomplishment(@RequestBody ResourceAccomplishmentDto resourceAccomplishmentDto,
+	public ResourceAccomplishmentDto addResourceAccomplishment(
+			@RequestBody ResourceAccomplishmentDto resourceAccomplishmentDto,
 			@RequestHeader(name = "lang", required = false) String lang) {
 
-		
 		ResourceAccomplishmentDto resultDto = new ResourceAccomplishmentDto();
 		try {
 
 			// Mandatory check.
 			StringBuilder errorParam = new StringBuilder();
-			//Resource Name.
-						
-			if (resourceAccomplishmentDto.getResourceName() == null || resourceAccomplishmentDto.getResourceName().isEmpty()) {
+			// Resource Name.
+
+			if (resourceAccomplishmentDto.getResourceName() == null
+					|| resourceAccomplishmentDto.getResourceName().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", ResourceName" : "ResourceName");
 			}
 			// EmployeeId
-			if (resourceAccomplishmentDto.getBuId() == null)  {
+			if (resourceAccomplishmentDto.getBuId() == null) {
 				errorParam.append(errorParam.length() > 0 ? ", BUId" : "BUId");
 			}
 			// Achievements
-			if (resourceAccomplishmentDto.getAchievements() == null || resourceAccomplishmentDto.getAchievements().isEmpty()) {
+			if (resourceAccomplishmentDto.getAchievements() == null
+					|| resourceAccomplishmentDto.getAchievements().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", Achievements" : "Achievements");
 			}
-		
 
 			if (errorParam.length() > 0) {
 				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
@@ -81,21 +82,20 @@ public class ResourceAccomplishmentController extends CommonController {
 		return resultDto;
 	}
 
-
-
 	@PutMapping("/updateResourceAccomplishment")
-	public ResourceAccomplishmentDto updateResourceAccomplishment(@RequestBody ResourceAccomplishmentDto resourceAccomplishmentDto,
+	public ResourceAccomplishmentDto updateResourceAccomplishment(
+			@RequestBody ResourceAccomplishmentDto resourceAccomplishmentDto,
 			@RequestHeader(name = "lang", required = false) String lang) {
 
-		
 		ResourceAccomplishmentDto resultDto = new ResourceAccomplishmentDto();
 		try {
 
 			// Mandatory check.
 			StringBuilder errorParam = new StringBuilder();
-			//Resource Name.
-						
-			if (resourceAccomplishmentDto.getResourceName() == null || resourceAccomplishmentDto.getResourceName().isEmpty()) {
+			// Resource Name.
+
+			if (resourceAccomplishmentDto.getResourceName() == null
+					|| resourceAccomplishmentDto.getResourceName().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", ResourceName" : "ResourceName");
 			}
 			// EmployeeId
@@ -103,10 +103,10 @@ public class ResourceAccomplishmentController extends CommonController {
 				errorParam.append(errorParam.length() > 0 ? ", BUId" : "BUId");
 			}
 			// Achievements
-			if (resourceAccomplishmentDto.getAchievements() == null || resourceAccomplishmentDto.getAchievements().isEmpty()) {
+			if (resourceAccomplishmentDto.getAchievements() == null
+					|| resourceAccomplishmentDto.getAchievements().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", Achievements" : "Achievements");
 			}
-		
 
 			if (errorParam.length() > 0) {
 				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
@@ -129,6 +129,7 @@ public class ResourceAccomplishmentController extends CommonController {
 
 		return resultDto;
 	}
+
 	@DeleteMapping("/deleteAccomplishmentById/{Id}")
 	public ResourceAccomplishmentDto deleteById(@PathVariable String Id,
 			@RequestHeader(name = "lang", required = false) String lang) {
@@ -149,7 +150,8 @@ public class ResourceAccomplishmentController extends CommonController {
 	}
 
 	@GetMapping("/getAllResourceAccomplishment")
-	public List<ResourceAccomplishmentDto> getAllResourceAccomplishment(@RequestHeader(name = "lang", required = false) String lang) {
+	public List<ResourceAccomplishmentDto> getAllResourceAccomplishment(
+			@RequestHeader(name = "lang", required = false) String lang) {
 
 		try {
 
@@ -161,9 +163,10 @@ public class ResourceAccomplishmentController extends CommonController {
 
 		return new ArrayList<ResourceAccomplishmentDto>();
 	}
-	
+
 	@GetMapping("/getResourceAccomplishmentByBuId/{buId}")
-	public List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuId(@PathVariable String buId,@RequestHeader(name = "lang", required = false) String lang) {
+	public List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuId(@PathVariable String buId,
+			@RequestHeader(name = "lang", required = false) String lang) {
 
 		try {
 
@@ -175,11 +178,26 @@ public class ResourceAccomplishmentController extends CommonController {
 
 		return new ArrayList<ResourceAccomplishmentDto>();
 	}
+	
+	@GetMapping("/getResourceAccomplishmentByBuIdYear/{buId}/{year}")
+	public List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuIdYear(@PathVariable String buId,@PathVariable int year,
+			@RequestHeader(name = "lang", required = false) String lang) {
+
+		try {
+
+			return resourceAccomplishmentService.getResourceAccomplishmentByBuIdYear(Long.parseLong(buId),year);
+
+		} catch (final Exception e) {
+			logger.error(HireProUsUtil.getErrorMessage(e));
+		}
+
+		return new ArrayList<ResourceAccomplishmentDto>();
+	}
 
 	@GetMapping("/getResourceAccomplishment/{id}")
 	public ResourceAccomplishmentDto getResourceAccomplishmentById(@PathVariable String id,
 			@RequestHeader(name = "lang", required = false) String lang) {
-		ResourceAccomplishmentDto resultDto=new ResourceAccomplishmentDto();
+		ResourceAccomplishmentDto resultDto = new ResourceAccomplishmentDto();
 
 		try {
 
@@ -195,11 +213,11 @@ public class ResourceAccomplishmentController extends CommonController {
 	@GetMapping("/getResourceAccomplishmentByName/{name}")
 	public List<ResourceAccomplishmentDto> getResourceAccomplishmentByName(@PathVariable String name,
 			@RequestHeader(name = "lang", required = false) String lang) {
-		List<ResourceAccomplishmentDto> resultDto=new ArrayList<ResourceAccomplishmentDto>();
+		List<ResourceAccomplishmentDto> resultDto = new ArrayList<ResourceAccomplishmentDto>();
 		System.out.println(name);
 		try {
 
-			resultDto=resourceAccomplishmentService.getResourceAccomplishmentByName(name);
+			resultDto = resourceAccomplishmentService.getResourceAccomplishmentByName(name);
 
 		} catch (final Exception e) {
 			logger.error(HireProUsUtil.getErrorMessage(e));
@@ -207,15 +225,15 @@ public class ResourceAccomplishmentController extends CommonController {
 
 		return resultDto;
 	}
-	
+
 	@GetMapping("/checkEntryValidity/{name}/{year}")
-	public ResourceAccomplishmentDto checkEntryValidity(@PathVariable String name,@PathVariable String year,
+	public ResourceAccomplishmentDto checkEntryValidity(@PathVariable String name, @PathVariable String year,
 			@RequestHeader(name = "lang", required = false) String lang) {
-		ResourceAccomplishmentDto resultDto=new ResourceAccomplishmentDto();
+		ResourceAccomplishmentDto resultDto = new ResourceAccomplishmentDto();
 		System.out.println(year);
 		try {
 
-			resultDto=resourceAccomplishmentService.checkEntryValidity(name,year);
+			resultDto = resourceAccomplishmentService.checkEntryValidity(name, year);
 
 		} catch (final Exception e) {
 			logger.error(HireProUsUtil.getErrorMessage(e));
@@ -223,6 +241,5 @@ public class ResourceAccomplishmentController extends CommonController {
 
 		return resultDto;
 	}
-	
-		
+
 }
