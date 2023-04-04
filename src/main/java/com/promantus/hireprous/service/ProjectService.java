@@ -4,6 +4,7 @@
  **********************************************************************************************/
 package com.promantus.hireprous.service;
 
+import java.util.HashMap;
 import java.util.List;
 
 import com.promantus.hireprous.dto.ProjectDto;
@@ -93,5 +94,7 @@ public interface ProjectService {
 	List<ProjectDto> getCustProjectBycustId(String custId) throws Exception;
 
 	List<ProjectDto> getProjectsByCustomerId(String customerId) throws Exception;
+
+	List<String> getAllProjectName() throws Exception;
 
 }

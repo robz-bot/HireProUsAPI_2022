@@ -65,6 +65,7 @@ public class UserDto implements Serializable {
 	private String subMenus;
 
 	private String active;
+	private String userType;
 
 	/**
 	 * @return the id
@@ -542,5 +543,13 @@ public class UserDto implements Serializable {
 
 	public void setManagerName(String managerName) {
 		this.managerName = managerName;
+	}
+
+	public String getUserType() {
+		return userType;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
 	}
 }

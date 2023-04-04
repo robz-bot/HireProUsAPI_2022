@@ -363,4 +363,27 @@ public final class HireProUsConstants {
 	/** SCHEDULE_DURATION_2_HOURS - '2 hours'. */
 	public static final String SCHEDULE_DURATION_2_HOURS = "2 hours";
 
+	//Timesheet Status
+	
+	//APPROVED
+	public static final String APPROVED = "Approved";
+	
+	//PENDING
+	public static final String PENDING = "Pending";
+	
+	//REJECT
+	public static final String REJECT = "Reject";
+	
+	
+	//TODAY
+		public static final String TODAY = "Today";
+		
+		//THISWEEK
+		public static final String THISWEEK = "This Week";
+		
+		//LASTWEEK
+		public static final String LASTWEEK = "Last Week";
+		
+		//YESTERDAY
+		public static final String YESTERDAY = "Yesterday";
 }

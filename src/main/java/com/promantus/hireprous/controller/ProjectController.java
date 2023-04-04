@@ -257,4 +257,19 @@ public class ProjectController extends CommonController {
 
 		return new ArrayList<ProjectDto>();
 	}
+	
+	@GetMapping("/getAllProjectName")
+	public List<String> getAllProjectName(@RequestHeader(name = "lang", required = false) String lang) 
+	{
+		try {
+			return projectService.getAllProjectName();
+			
+	  } catch (final Exception e) {
+		  
+		logger.error(HireProUsUtil.getErrorMessage(e));
+		
+		}
+		
+		return null;
+		}
 }

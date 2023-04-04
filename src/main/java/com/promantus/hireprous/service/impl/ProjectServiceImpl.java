@@ -6,7 +6,10 @@ package com.promantus.hireprous.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -327,5 +330,23 @@ public class ProjectServiceImpl implements ProjectService {
 
 		return projectDtoList;
 	}
-	
+
+	@Override
+	public List<String> getAllProjectName() throws Exception {
+		
+		List<Project> projectsList = projectRepository.findAll();
+		
+		Map<Long, String> result = new HashMap<>();
+		
+		for (Project project : projectsList) {
+			
+			result.put(project.getId(), project.getProjectName());
+		}
+		List<Map.Entry<Long,String>> entryList = new ArrayList<>(result.entrySet());
+		
+		List<String> valueList = entryList.stream()
+		        .map(entry -> entry.getKey() + ": " + entry.getValue())
+		        .collect(Collectors.toList());
+		return valueList;
+ }	
 }

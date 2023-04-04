@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.catalina.webresources.Cache;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -25,23 +25,16 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.stereotype.Service;
+
 
 import com.promantus.hireprous.HireProUsConstants;
 import com.promantus.hireprous.HireProUsDefaultMethods;
 import com.promantus.hireprous.dto.AccomplishmentRatingDto;
-import com.promantus.hireprous.dto.CandidateDto;
 import com.promantus.hireprous.entity.AccomplishmentRating;
-import com.promantus.hireprous.entity.Candidate;
-import com.promantus.hireprous.entity.User;
 import com.promantus.hireprous.repository.AccomplishmentRatingRepositroy;
-import com.promantus.hireprous.repository.UserRepository;
 import com.promantus.hireprous.service.AccomplishmentRatingService;
 import com.promantus.hireprous.service.BusinessUnitService;
 import com.promantus.hireprous.service.CommonService;
-import com.promantus.hireprous.service.UserService;
 import com.promantus.hireprous.util.CacheUtil;
 import com.promantus.hireprous.util.HireProUsUtil;
 
