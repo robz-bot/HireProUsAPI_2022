@@ -40,6 +40,8 @@ public class TimeSheetDto implements Serializable{
 	private String designation;
 	private String approvedByManager;
 	
+	private Double hours;
+	
 	public Long getId() {
 		return id;
 	}
@@ -190,4 +192,11 @@ public class TimeSheetDto implements Serializable{
 	public void setApprovedByManager(String approvedByManager) {
 		this.approvedByManager = approvedByManager;
 	}
+	public Double getHours() {
+		return hours;
+	}
+	public void setHours(Double hours) {
+		this.hours = hours;
+	}
+	
 }

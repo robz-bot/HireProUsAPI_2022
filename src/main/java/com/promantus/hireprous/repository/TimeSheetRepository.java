@@ -1,7 +1,6 @@
 package com.promantus.hireprous.repository;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -20,8 +19,6 @@ public interface TimeSheetRepository extends MongoRepository<TimeSheet, String> 
 	List<TimeSheet> findTimeSheetByManagerIdAndIsSubmittedForApproval(long managerId, boolean b);
 
 	List<TimeSheet> findTimeSheetByUserId(long parseLong);
-
-//	TimeSheet findByDate(String date);
 
 	List<TimeSheet> findAllByDate(String date);
 

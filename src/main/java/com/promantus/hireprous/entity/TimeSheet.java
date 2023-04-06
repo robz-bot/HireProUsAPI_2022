@@ -42,6 +42,9 @@ public class TimeSheet {
 	private Long buId;
 	private String approvedByManager;
 	
+	//added for dashboard charts @sumesh-05/04/23
+	private Double hours;
+	
 	public Long getId() {
 		return id;
 	}
@@ -156,6 +159,12 @@ public class TimeSheet {
 	}
 	public void setApprovedByManager(String approvedByManager) {
 		this.approvedByManager = approvedByManager;
+	}
+	public Double getHours() {
+		return hours;
+	}
+	public void setHours(Double hours) {
+		this.hours = hours;
 	}
 	
 		

@@ -1,10 +1,10 @@
 package com.promantus.hireprous.service.impl;
 
+import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +66,19 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 		timesheet.setCreatedDateTime(LocalDateTime.now());
 		timesheet.setUpdatedDateTime(LocalDateTime.now());
 		timesheet.setApprovedByManager("Pending");
+		
+		//Added hours field for dashboard @Sumesh-06-04-23
+		int hours = Integer.parseInt(timeSheetDto.getCalHrs().split("h")[0]);
+		int hoursMin = Integer.parseInt(timeSheetDto.getCalHrs().split("h")[1].split("min")[0].trim());
+
+		Float val = Float.parseFloat(hours + "." + hoursMin);
+		System.out.println("_____" + val);
+		String formattedValue = String.format("%.2f", val);
+		double roundedValue = (double) Math.round(Double.parseDouble(formattedValue) * 100) / 100;
+		System.out.println(roundedValue);
+
+		timesheet.setHours(roundedValue);
+
 		timeSheetRepository.save(timesheet);
 
 		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
@@ -306,8 +319,8 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 	public List<TimeSheetDto> searchByDate(SearchDto searchDto, String lang) throws Exception {
 
 		List<TimeSheetDto> timeSheetDtoList = new ArrayList<>();
-		
-		if(searchDto.getType().equals(HireProUsConstants.THISWEEK)){
+
+		if (searchDto.getType().equals(HireProUsConstants.THISWEEK)) {
 			// Get the current date
 			LocalDate currentDate = LocalDate.now();
 
@@ -330,39 +343,39 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 
 			for (int i = 0; i < numDays; i++) {
 				weekDateStrings[i] = weekDates[i].format(formatter);
-			} 
+			}
 			List<TimeSheet> timeSheetList = new ArrayList<>();
 			for (String date : weekDateStrings) {
-					timeSheetList.addAll(timeSheetRepository.findAllByDate(date));
+				timeSheetList.addAll(timeSheetRepository.findAllByDate(date));
 			}
 			for (TimeSheet timesheet : timeSheetList) {
 				timeSheetDtoList.add(this.getTimeSheetDto(timesheet));
 			}
-		}else if (searchDto.getType().equals(HireProUsConstants.TODAY)) {
-				
+		} else if (searchDto.getType().equals(HireProUsConstants.TODAY)) {
+
 			LocalDate currentDate = LocalDate.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
 			String today = currentDate.format(formatter);
-			
+
 			List<TimeSheet> timeSheetList = timeSheetRepository.findAllByDate(today);
 
 			for (TimeSheet timesheet : timeSheetList) {
-				
+
 				timeSheetDtoList.add(this.getTimeSheetDto(timesheet));
 			}
-		}else if (searchDto.getType().equals(HireProUsConstants.YESTERDAY)) {
-			
-			LocalDate yesterdayDate = LocalDate.now().minusDays(1);		
+		} else if (searchDto.getType().equals(HireProUsConstants.YESTERDAY)) {
+
+			LocalDate yesterdayDate = LocalDate.now().minusDays(1);
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
 			String yesterday = yesterdayDate.format(formatter);
-			
+
 			List<TimeSheet> timeSheetList = timeSheetRepository.findAllByDate(yesterday);
 			for (TimeSheet timeSheet : timeSheetList) {
-				
+
 				timeSheetDtoList.add(this.getTimeSheetDto(timeSheet));
-			}	
-		}else if (searchDto.getType().equals(HireProUsConstants.LASTWEEK)) {
-			
+			}
+		} else if (searchDto.getType().equals(HireProUsConstants.LASTWEEK)) {
+
 //			LocalDate currentDate = LocalDate.now();
 //			LocalDate lastWeekStartDate = currentDate.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
 //			LocalDate lastWeekEndDate = lastWeekStartDate.plusDays(6);
@@ -383,24 +396,63 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 			int numDays = 7;
 			LocalDate[] lastWeekDates = new LocalDate[numDays];
 			for (int i = 0; i < numDays; i++) {
-			    lastWeekDates[i] = lastWeekStartDate.plusDays(i);
+				lastWeekDates[i] = lastWeekStartDate.plusDays(i);
 			}
 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
 			String[] lastWeekDateStrings = new String[numDays];
 			for (int i = 0; i < numDays; i++) {
-			    lastWeekDateStrings[i] = lastWeekDates[i].format(formatter);
+				lastWeekDateStrings[i] = lastWeekDates[i].format(formatter);
 			}
 
 			List<TimeSheet> timeSheetList = new ArrayList<>();
 			for (String date : lastWeekDateStrings) {
-					timeSheetList.addAll(timeSheetRepository.findAllByDate(date));
+				timeSheetList.addAll(timeSheetRepository.findAllByDate(date));
 			}
 			for (TimeSheet timesheet : timeSheetList) {
 				timeSheetDtoList.add(this.getTimeSheetDto(timesheet));
 			}
 		}
 		return timeSheetDtoList;
+	}
+
+	@Override
+	public Map<String, Object> getTaskAndHours() throws Exception {
+
+		List<TimeSheet> timeSheets = timeSheetRepository.findAll();
+
+		Map<String, Double> taskAndHours = new HashMap<>();
+
+		for (TimeSheet timeSheet : timeSheets) {
+			taskAndHours.put(timeSheet.getTask(), 0D);
+		}
+		for (String key : taskAndHours.keySet()) {
+			Double totalHours = 0D;
+			for (TimeSheet timeSheet : timeSheets) {
+
+				if (key.equals(timeSheet.getTask())
+						&& timeSheet.getApprovedByManager().equals(HireProUsConstants.APPROVED)) {
+
+					Double hours = timeSheet.getHours();
+					totalHours += hours;
+					DecimalFormat df = new DecimalFormat("#.00");
+					Double formattedValue = Double.parseDouble(df.format(totalHours));
+
+					if (taskAndHours.containsKey(key)) {
+						taskAndHours.put(key, formattedValue);
+					}
+				}
+			}
+		}
+
+		List<String> tasks = new ArrayList<>(taskAndHours.keySet());
+		List<Double> hours = new ArrayList<>(taskAndHours.values());
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("tasks", tasks);
+		response.put("hours", hours);
+
+		return response;
 	}
 
 }

@@ -372,7 +372,7 @@ public final class HireProUsConstants {
 	public static final String PENDING = "Pending";
 	
 	//REJECT
-	public static final String REJECT = "Reject";
+	public static final String REJECT = "Rejected";
 	
 	
 	//TODAY

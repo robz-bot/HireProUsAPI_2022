@@ -32,5 +32,6 @@ public interface TimeSheetService {
 
 	List<TimeSheetDto> searchByDate(SearchDto searchDto, String lang) throws Exception;
 
+	Map<String, Object> getTaskAndHours() throws Exception;
 	
 }

@@ -8,10 +8,12 @@ package com.promantus.hireprous.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,7 +51,6 @@ public class TimeSheetController extends CommonController {
 		
 		TimeSheetDto resultDto = new TimeSheetDto();
 		try {
-			StringBuilder errorParam = new StringBuilder();
 			
 			// Time Sheet Date
 			if (timeSheetDto.getDate() == null || timeSheetDto.getDate().isEmpty()) {
@@ -366,6 +367,21 @@ public class TimeSheetController extends CommonController {
 
 	        return resultDto;
 	    }
+	}
+	
+	@GetMapping("/getTaskAndHours")
+	public ResponseEntity<Map<String, Object>> getTaskAndHours (@RequestHeader(name = "lang", required = false) String lang){
+		
+		try {
+			
+			Map<String, Object> response = timeSheetService.getTaskAndHours();
+			return ResponseEntity.ok(response);
+			
+		} catch (final Exception e) {
+			logger.error(HireProUsUtil.getErrorMessage(e));
+		}
+		
+		return null;
 	}
 	
 }
