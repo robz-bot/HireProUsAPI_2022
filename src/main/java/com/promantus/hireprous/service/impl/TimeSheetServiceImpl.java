@@ -495,6 +495,7 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 		List<Double> phours = new ArrayList<>(projectAndHours.values());
 
 		Map<String, Object> response = new HashMap<>();
+		
 		response.put("tasks", tasks);
 		response.put("thours", thours);
 		response.put("projects", projects);
