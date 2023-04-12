@@ -369,12 +369,12 @@ public class TimeSheetController extends CommonController {
 	    }
 	}
 	
-	@GetMapping("/getTaskAndHours")
-	public ResponseEntity<Map<String, Object>> getTaskAndHours (@RequestHeader(name = "lang", required = false) String lang){
+	@GetMapping("/getTaskAndHours/{userId}")
+	public ResponseEntity<Map<String, Object>> getTaskAndHours (@PathVariable String userId,@RequestHeader(name = "lang", required = false) String lang){
 		
 		try {
 			
-			Map<String, Object> response = timeSheetService.getTaskAndHours();
+			Map<String, Object> response = timeSheetService.getTaskAndHours(Long.parseLong(userId));
 			return ResponseEntity.ok(response);
 			
 		} catch (final Exception e) {

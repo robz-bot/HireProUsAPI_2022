@@ -19,8 +19,10 @@ import org.springframework.stereotype.Service;
 import com.promantus.hireprous.HireProUsConstants;
 import com.promantus.hireprous.dto.SearchDto;
 import com.promantus.hireprous.dto.TimeSheetDto;
+import com.promantus.hireprous.entity.Project;
 import com.promantus.hireprous.entity.TimeSheet;
 import com.promantus.hireprous.entity.User;
+import com.promantus.hireprous.repository.ProjectRepository;
 import com.promantus.hireprous.repository.TimeSheetRepository;
 import com.promantus.hireprous.repository.UserRepository;
 import com.promantus.hireprous.service.CommonService;
@@ -41,6 +43,9 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	ProjectRepository projectRepository;
 
 	@Override
 	public TimeSheetDto addTimeSheet(TimeSheetDto timeSheetDto, String lang) throws Exception {
@@ -66,8 +71,8 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 		timesheet.setCreatedDateTime(LocalDateTime.now());
 		timesheet.setUpdatedDateTime(LocalDateTime.now());
 		timesheet.setApprovedByManager("Pending");
-		
-		//Added hours field for dashboard @Sumesh-06-04-23
+
+		// Added hours field for dashboard @Sumesh-06-04-23
 		int hours = Integer.parseInt(timeSheetDto.getCalHrs().split("h")[0]);
 		int hoursMin = Integer.parseInt(timeSheetDto.getCalHrs().split("h")[1].split("min")[0].trim());
 
@@ -104,7 +109,7 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 		timeSheet.setDate(timeSheetDto.getDate());
 		timeSheet.setProjectId(timeSheetDto.getProjectId());
 		timeSheet.setUserId(timeSheetDto.getUserId());
-		timeSheet.setManagerId(timeSheetDto.getUserId());
+//		timeSheet.setManagerId(timeSheetDto.getUserId());
 
 		timeSheet.setTask(timeSheetDto.getTask());
 		timeSheet.setDescription(timeSheetDto.getDescription());
@@ -115,6 +120,7 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 
 		timeSheet.setSubmittedForApproval(timeSheetDto.isSubmittedForApproval());
 		timeSheet.setTimesheetStatus(timeSheetDto.getTimesheetStatus());
+		timeSheet.setSubmittedForApproval(false);
 
 		timeSheet.setUpdatedBy(timeSheetDto.getUpdatedBy());
 		timeSheet.setUpdatedDateTime(LocalDateTime.now());
@@ -163,6 +169,7 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 		timeSheetDto.setUpdatedByName(CacheUtil.getUsersMap().get(timeSheet.getUpdatedBy()));
 		timeSheetDto.setUpdatedDateTime(HireProUsUtil.getGMTDateTime(timeSheet.getUpdatedDateTime()));
 		timeSheetDto.setApprovedByManager(timeSheet.getApprovedByManager());
+		timeSheetDto.setHours(timeSheet.getHours());
 
 //		timeSheetDto.setDesignation(CacheUtil.getUsersMap().get(timeSheet.getUserId()));	
 		User user = userRepository.findById(timeSheet.getUserId());
@@ -267,6 +274,7 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 		List<TimeSheetDto> timeSheetDtoList = new ArrayList<>();
 
 		List<TimeSheet> list = timeSheetRepository.findTimeSheetByManagerIdAndIsSubmittedForApproval(managerId, true);
+//		List<TimeSheet> list = timeSheetRepository.findTimeSheetByManagerIdAndApprovedByManager(managerId, HireProUsConstants.PENDING);
 		for (TimeSheet timeSheet : list) {
 			timeSheetDtoList.add(this.getTimeSheetDto(timeSheet));
 		}
@@ -417,21 +425,36 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 	}
 
 	@Override
-	public Map<String, Object> getTaskAndHours() throws Exception {
+	public Map<String, Object> getTaskAndHours(Long userId) throws Exception {
 
 		List<TimeSheet> timeSheets = timeSheetRepository.findAll();
 
 		Map<String, Double> taskAndHours = new HashMap<>();
+		Map<String, Double> projectAndHours = new HashMap<>();
+
+		int month = LocalDateTime.now().getMonthValue();
+		int year = LocalDateTime.now().getYear();
 
 		for (TimeSheet timeSheet : timeSheets) {
-			taskAndHours.put(timeSheet.getTask(), 0D);
+			if (timeSheet.getUserId().equals(userId) && timeSheet.getUpdatedDateTime().getMonthValue() == month
+					&& timeSheet.getUpdatedDateTime().getYear() == year)
+				taskAndHours.put(timeSheet.getTask(), 0D);
 		}
+
+		for (TimeSheet timeSheet : timeSheets) {
+			if (timeSheet.getUserId().equals(userId) && timeSheet.getUpdatedDateTime().getMonthValue() == month
+					&& timeSheet.getUpdatedDateTime().getYear() == year) {
+				Project project = projectRepository.findById(timeSheet.getProjectId());
+				projectAndHours.put(project.getProjectName(), 0D);
+			}
+		}
+
 		for (String key : taskAndHours.keySet()) {
 			Double totalHours = 0D;
 			for (TimeSheet timeSheet : timeSheets) {
-
-				if (key.equals(timeSheet.getTask())
-						&& timeSheet.getApprovedByManager().equals(HireProUsConstants.APPROVED)) {
+				if (key.equals(timeSheet.getTask()) && timeSheet.getUserId().equals(userId)
+						&& timeSheet.getUpdatedDateTime().getMonthValue() == month
+						&& timeSheet.getUpdatedDateTime().getYear() == year) {
 
 					Double hours = timeSheet.getHours();
 					totalHours += hours;
@@ -444,13 +467,38 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 				}
 			}
 		}
+		
+		for (String key : projectAndHours.keySet()) {
+			Double totalHours = 0D;
+			for (TimeSheet timeSheet : timeSheets) {
+				Project project = projectRepository.findById(timeSheet.getProjectId());
+				if (key.equals(project.getProjectName()) && timeSheet.getUserId().equals(userId)
+						&& timeSheet.getUpdatedDateTime().getMonthValue() == month
+						&& timeSheet.getUpdatedDateTime().getYear() == year) {
+
+					Double hours = timeSheet.getHours();
+					totalHours += hours;
+					DecimalFormat df = new DecimalFormat("#.00");
+					Double formattedValue = Double.parseDouble(df.format(totalHours));
+
+					if (projectAndHours.containsKey(key)) {
+						projectAndHours.put(key, formattedValue);
+					}
+				}
+			}
+		}
 
 		List<String> tasks = new ArrayList<>(taskAndHours.keySet());
-		List<Double> hours = new ArrayList<>(taskAndHours.values());
+		List<Double> thours = new ArrayList<>(taskAndHours.values());
+		
+		List<String> projects = new ArrayList<>(projectAndHours.keySet());
+		List<Double> phours = new ArrayList<>(projectAndHours.values());
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("tasks", tasks);
-		response.put("hours", hours);
+		response.put("thours", thours);
+		response.put("projects", projects);
+		response.put("phours", phours);
 
 		return response;
 	}

@@ -24,4 +24,6 @@ public interface TimeSheetRepository extends MongoRepository<TimeSheet, String> 
 
 	List<TimeSheet> findAllByDate(LocalDate today);
 
+	List<TimeSheet> findTimeSheetByManagerIdAndApprovedByManager(long managerId, String pending);
+
 }
