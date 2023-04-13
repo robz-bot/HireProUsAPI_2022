@@ -47,6 +47,10 @@ public class User {
 	private String colorCode;
 
 	private String active;
+	
+	// added for Pro-Timesheet @sumesh-12-04-2023
+	private String dateOfJoining;
+	private String dateOfBirth;
 
 	/**
 	 * @return the id
@@ -334,5 +338,21 @@ public class User {
 
 	public void setManagerId(long managerId) {
 		this.managerId = managerId;
+	}
+	
+	public String getDateOfJoining() {
+		return dateOfJoining;
+	}
+
+	public void setDateOfJoining(String dateOfJoining) {
+		this.dateOfJoining = dateOfJoining;
+	}
+
+	public String getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(String dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
 	}
 }

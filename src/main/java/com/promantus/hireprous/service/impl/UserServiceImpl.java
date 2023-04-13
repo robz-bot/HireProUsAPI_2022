@@ -129,6 +129,9 @@ public class UserServiceImpl implements UserService {
 		user.setUpdatedDateTime(LocalDateTime.now());
 
 		user.setActive("1");
+		
+		user.setDateOfJoining(userDto.getDateOfJoining());
+		user.setDateOfBirth(userDto.getDateOfBirth());
 
 		userRepository.save(user);
 
@@ -210,6 +213,9 @@ public class UserServiceImpl implements UserService {
 		user.setUpdatedBy(userDto.getUpdatedBy());
 		user.setUpdatedDateTime(LocalDateTime.now());
 
+		user.setDateOfJoining(userDto.getDateOfJoining());
+		user.setDateOfBirth(userDto.getDateOfBirth());
+		
 		userRepository.save(user);
 
 		// Cache
@@ -491,6 +497,9 @@ public class UserServiceImpl implements UserService {
 		userDto.setUpdatedByName(CacheUtil.getUsersMap().get(user.getUpdatedBy()));
 		userDto.setUpdatedDateTime(HireProUsUtil.getGMTDateTime(user.getUpdatedDateTime()));
 
+		userDto.setDateOfJoining(user.getDateOfJoining());
+		userDto.setDateOfBirth(user.getDateOfBirth());
+		
 		return userDto;
 	}
 

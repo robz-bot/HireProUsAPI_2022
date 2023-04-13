@@ -66,6 +66,10 @@ public class UserDto implements Serializable {
 
 	private String active;
 	private String userType;
+	
+	// added for Pro-Timesheet @sumesh-12-04-2023
+	private String dateOfJoining;
+	private String dateOfBirth;
 
 	/**
 	 * @return the id
@@ -551,5 +555,21 @@ public class UserDto implements Serializable {
 
 	public void setUserType(String userType) {
 		this.userType = userType;
+	}
+	
+	public String getDateOfJoining() {
+		return dateOfJoining;
+	}
+
+	public void setDateOfJoining(String dateOfJoining) {
+		this.dateOfJoining = dateOfJoining;
+	}
+
+	public String getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(String dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
 	}
 }

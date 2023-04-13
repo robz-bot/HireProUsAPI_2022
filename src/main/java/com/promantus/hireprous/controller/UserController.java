@@ -89,7 +89,14 @@ public class UserController extends CommonController {
 			if (userDto.getDesignation() == null || userDto.getDesignation().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", Designation" : "Designation");
 			}
-
+			// Joing Date
+			if (userDto.getDateOfJoining() == null || userDto.getDateOfJoining().isEmpty()) {
+				errorParam.append(errorParam.length() > 0 ? ", Joining Date" : "Joining Date");
+			}
+			// Date Of Birth
+			if (userDto.getDateOfBirth() == null || userDto.getDateOfBirth().isEmpty()) {
+				errorParam.append(errorParam.length() > 0 ? ", Date Of Birth" : "Date Of Birth");
+			}
 			if (errorParam.length() > 0) {
 				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 				resultDto.setMessage(
@@ -183,7 +190,14 @@ public class UserController extends CommonController {
 			if (userDto.getDesignation() == null || userDto.getDesignation().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", Designation" : "Designation");
 			}
-
+			// Joing Date
+			if (userDto.getDateOfJoining() == null || userDto.getDateOfJoining().isEmpty()) {
+				errorParam.append(errorParam.length() > 0 ? ", Joining Date" : "Joining Date");
+			}
+			// Date Of Birth
+			if (userDto.getDateOfBirth() == null || userDto.getDateOfBirth().isEmpty()) {
+				errorParam.append(errorParam.length() > 0 ? ", Date Of Birth" : "Date Of Birth");
+			}
 			if (errorParam.length() > 0) {
 				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 				resultDto.setMessage(
