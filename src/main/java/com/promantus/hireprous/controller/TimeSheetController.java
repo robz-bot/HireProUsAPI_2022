@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.promantus.hireprous.HireProUsConstants;
 import com.promantus.hireprous.dto.SearchDto;
 import com.promantus.hireprous.dto.TimeSheetDto;
+import com.promantus.hireprous.dto.UserDto;
 import com.promantus.hireprous.service.TimeSheetService;
 import com.promantus.hireprous.util.HireProUsUtil;
 
@@ -383,6 +384,32 @@ public class TimeSheetController extends CommonController {
 		
 		return null;
 	}
-	
+	@GetMapping("/getAllDateOfBirth")
+	public List<String> getAllDateOfBirth(@RequestHeader(name = "lang", required = false) String lang) {
+
+		try {
+			return timeSheetService.getAllDateOfBirth();
+		} catch (final Exception e) {
+			logger.error(HireProUsUtil.getErrorMessage(e));
+		}
+		
+		return null;
+		
+	}
+	@GetMapping("/getAllDateOfJoining")
+	public List<String> getAllDateOfJoining(@RequestHeader(name = "lang", required = false) String lang) {
+
+		try {
+			
+			return timeSheetService.getAllDateOfJoining();
+			
+		} catch (final Exception e) {
+			
+			logger.error(HireProUsUtil.getErrorMessage(e));
+		}
+		
+		return null;
+		
+	}
 }
 

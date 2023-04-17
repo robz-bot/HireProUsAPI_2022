@@ -6,7 +6,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.promantus.hireprous.HireProUsConstants;
 import com.promantus.hireprous.dto.SearchDto;
 import com.promantus.hireprous.dto.TimeSheetDto;
+import com.promantus.hireprous.dto.UserDto;
 import com.promantus.hireprous.entity.Project;
 import com.promantus.hireprous.entity.TimeSheet;
 import com.promantus.hireprous.entity.User;
@@ -467,7 +470,7 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 				}
 			}
 		}
-		
+
 		for (String key : projectAndHours.keySet()) {
 			Double totalHours = 0D;
 			for (TimeSheet timeSheet : timeSheets) {
@@ -490,12 +493,12 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 
 		List<String> tasks = new ArrayList<>(taskAndHours.keySet());
 		List<Double> thours = new ArrayList<>(taskAndHours.values());
-		
+
 		List<String> projects = new ArrayList<>(projectAndHours.keySet());
 		List<Double> phours = new ArrayList<>(projectAndHours.values());
 
 		Map<String, Object> response = new HashMap<>();
-		
+
 		response.put("tasks", tasks);
 		response.put("thours", thours);
 		response.put("projects", projects);
@@ -504,4 +507,49 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 		return response;
 	}
 
+	@Override
+	public List<String> getAllDateOfBirth() throws Exception {
+
+//		int date = LocalDateTime.now().getDayOfMonth();
+//		int month = LocalDateTime.now().getMonthValue();
+		String date = String.format("%02d", LocalDateTime.now().getDayOfMonth());
+		String month = String.format("%02d", LocalDateTime.now().getMonthValue());
+
+		String dateAndMonth = month + "-" + date;
+
+		List<String> dobNames = new ArrayList<>();
+
+		List<User> users = userRepository.findAll();
+		for (User user : users) {
+			String userDob = user.getDateOfBirth().split("-")[1] + "-" + user.getDateOfBirth().split("-")[2];
+			System.out.println(userDob);
+			if (userDob.equals(dateAndMonth)) {
+				dobNames.add(user.getFirstName() + " " + user.getLastName());
+			}
+
+		}
+
+		return dobNames;
+
+	}
+
+	@Override
+	public List<String> getAllDateOfJoining() throws Exception {
+		
+		String date = String.format("%02d", LocalDateTime.now().getDayOfMonth());
+		String month = String.format("%02d", LocalDateTime.now().getMonthValue());
+		
+		String dateAndMonth = month + "-" +date;
+		
+		List<String> dojNames = new ArrayList<>();
+		
+		List<User> users = userRepository.findAll();
+		for (User user : users) {
+			String userDoj = user.getDateOfJoining().split("-")[1] + "-" + user.getDateOfJoining().split("-")[2];
+			if (userDoj.equals(dateAndMonth)) {
+				dojNames.add(user.getFirstName() + user.getLastName());
+			}
+		}
+		return dojNames;
+	}
 }
