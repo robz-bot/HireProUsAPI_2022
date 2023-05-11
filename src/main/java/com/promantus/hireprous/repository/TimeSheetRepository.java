@@ -4,8 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
-
+import com.promantus.hireprous.dto.HistoryDto;
 import com.promantus.hireprous.entity.TimeSheet;
 
 public interface TimeSheetRepository extends MongoRepository<TimeSheet, String> {
@@ -25,5 +26,10 @@ public interface TimeSheetRepository extends MongoRepository<TimeSheet, String> 
 	List<TimeSheet> findAllByDate(LocalDate today);
 
 	List<TimeSheet> findTimeSheetByManagerIdAndApprovedByManager(long managerId, String pending);
+
+	List<TimeSheet> findAllByUserIdAndDate(Long userId, String date);
+
+	@Query("{$group: { _id: '$date', records: { $push: '$$ROOT' } } }")
+	List<HistoryDto> getAllRecords();
 
 }

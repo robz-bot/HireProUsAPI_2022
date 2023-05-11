@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,12 +21,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.promantus.hireprous.HireProUsConstants;
+import com.promantus.hireprous.dto.HistoryDto;
 import com.promantus.hireprous.dto.SearchDto;
 import com.promantus.hireprous.dto.TimeSheetDto;
 import com.promantus.hireprous.dto.UserDto;
 import com.promantus.hireprous.entity.Project;
 import com.promantus.hireprous.entity.TimeSheet;
 import com.promantus.hireprous.entity.User;
+import com.promantus.hireprous.repository.BusinessUnitRepository;
 import com.promantus.hireprous.repository.ProjectRepository;
 import com.promantus.hireprous.repository.TimeSheetRepository;
 import com.promantus.hireprous.repository.UserRepository;
@@ -50,10 +54,20 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 	@Autowired
 	ProjectRepository projectRepository;
 
+	@Autowired
+	BusinessUnitRepository businessUnitRepository;
+
 	@Override
 	public TimeSheetDto addTimeSheet(TimeSheetDto timeSheetDto, String lang) throws Exception {
-
 		TimeSheetDto resultDto = new TimeSheetDto();
+
+		List<TimeSheet> timesheets = timeSheetRepository.findAllByUserIdAndDate(timeSheetDto.getUserId(),
+				timeSheetDto.getDate());
+		if (timesheets.size() >= 5) {
+			resultDto.setMessage("Already 5 records added");
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+			return resultDto;
+		}
 
 		TimeSheet timesheet = new TimeSheet();
 		timesheet.setId(commonService.nextSequenceNumber());
@@ -68,6 +82,7 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 		timesheet.setDescription(timeSheetDto.getDescription());
 		timesheet.setSubmittedForApproval(false);
 		timesheet.setTimesheetStatus(timeSheetDto.getTimesheetStatus());
+		timesheet.setBillable(timeSheetDto.isBillable());
 
 		timesheet.setCreatedBy(timeSheetDto.getCreatedBy());
 		timesheet.setUpdatedBy(timeSheetDto.getUpdatedBy());
@@ -124,6 +139,7 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 		timeSheet.setSubmittedForApproval(timeSheetDto.isSubmittedForApproval());
 		timeSheet.setTimesheetStatus(timeSheetDto.getTimesheetStatus());
 		timeSheet.setSubmittedForApproval(false);
+		timeSheet.setBillable(timeSheetDto.isBillable());
 
 		timeSheet.setUpdatedBy(timeSheetDto.getUpdatedBy());
 		timeSheet.setUpdatedDateTime(LocalDateTime.now());
@@ -173,6 +189,8 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 		timeSheetDto.setUpdatedDateTime(HireProUsUtil.getGMTDateTime(timeSheet.getUpdatedDateTime()));
 		timeSheetDto.setApprovedByManager(timeSheet.getApprovedByManager());
 		timeSheetDto.setHours(timeSheet.getHours());
+		timeSheetDto.setBillable(timeSheet.isBillable());
+		timeSheetDto.setComments(timeSheet.getComments());
 
 //		timeSheetDto.setDesignation(CacheUtil.getUsersMap().get(timeSheet.getUserId()));	
 		User user = userRepository.findById(timeSheet.getUserId());
@@ -309,8 +327,9 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 			resultDto.setMessage("TimeSheet Approved");
 			timeSheet.setApprovedByManager(HireProUsConstants.APPROVED);
 			timeSheet.setTimesheetStatus(HireProUsConstants.APPROVED);
+			timeSheet.setUpdatedDateTime(LocalDateTime.now());
 		} else if (timeSheetDto.getApprovedByManager().equals(HireProUsConstants.REJECT)) {
-
+			timeSheet.setUpdatedDateTime(LocalDateTime.now());
 			timeSheet.setComments(timeSheetDto.getComments());
 			resultDto.setMessage("TimeSheet Declined");
 			timeSheet.setApprovedByManager(HireProUsConstants.REJECT);
@@ -428,6 +447,70 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 	}
 
 	@Override
+	public Map<String, Double> getBillable(long userId) {
+		List<TimeSheet> timeSheets = timeSheetRepository.findAll();
+		Map<String, Double> billable = new HashMap<>();
+		Map<String, Double> nonBillable = new HashMap<>();
+
+		int month = LocalDateTime.now().getMonthValue();
+		int year = LocalDateTime.now().getYear();
+
+		for (TimeSheet timeSheet : timeSheets) {
+			if (timeSheet.getUserId().equals(userId) && timeSheet.isBillable()
+					&& timeSheet.getUpdatedDateTime().getMonthValue() == month
+					&& timeSheet.getUpdatedDateTime().getYear() == year)
+				billable.put("Billable", 0D);
+		}
+
+		for (String key : billable.keySet()) {
+			Double totalHours = 0D;
+			for (TimeSheet timeSheet : timeSheets) {
+				if (timeSheet.getUserId().equals(userId) && timeSheet.isBillable()
+						&& timeSheet.getUpdatedDateTime().getMonthValue() == month
+						&& timeSheet.getUpdatedDateTime().getYear() == year) {
+
+					Double hours = timeSheet.getHours();
+					totalHours += hours;
+					DecimalFormat df = new DecimalFormat("#.00");
+					Double formattedValue = Double.parseDouble(df.format(totalHours));
+
+					if (billable.containsKey(key)) {
+						billable.put(key, formattedValue);
+					}
+				}
+			}
+		}
+
+		for (TimeSheet timeSheet : timeSheets) {
+			if (timeSheet.getUserId().equals(userId) && !timeSheet.isBillable()
+					&& timeSheet.getUpdatedDateTime().getMonthValue() == month
+					&& timeSheet.getUpdatedDateTime().getYear() == year)
+				nonBillable.put("NonBillable", 0D);
+		}
+
+		for (String key : nonBillable.keySet()) {
+			Double totalHours = 0D;
+			for (TimeSheet timeSheet : timeSheets) {
+				if (timeSheet.getUserId().equals(userId) && !timeSheet.isBillable()
+						&& timeSheet.getUpdatedDateTime().getMonthValue() == month
+						&& timeSheet.getUpdatedDateTime().getYear() == year) {
+
+					Double hours = timeSheet.getHours();
+					totalHours += hours;
+					DecimalFormat df = new DecimalFormat("#.00");
+					Double formattedValue = Double.parseDouble(df.format(totalHours));
+
+					if (nonBillable.containsKey(key)) {
+						billable.put(key, formattedValue);
+					}
+				}
+			}
+		}
+
+		return billable;
+	}
+
+	@Override
 	public Map<String, Object> getTaskAndHours(Long userId) throws Exception {
 
 		List<TimeSheet> timeSheets = timeSheetRepository.findAll();
@@ -524,7 +607,8 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 			String userDob = user.getDateOfBirth().split("-")[1] + "-" + user.getDateOfBirth().split("-")[2];
 			System.out.println(userDob);
 			if (userDob.equals(dateAndMonth)) {
-				dobNames.add(user.getFirstName() + " " + user.getLastName());
+				String buName = businessUnitRepository.findById(user.getBusinessUnitId()).getBusinessUnitName();
+				dobNames.add(user.getFirstName() + " " + user.getLastName() + " - " + buName);
 			}
 
 		}
@@ -535,21 +619,79 @@ public class TimeSheetServiceImpl implements TimeSheetService {
 
 	@Override
 	public List<String> getAllDateOfJoining() throws Exception {
-		
+
 		String date = String.format("%02d", LocalDateTime.now().getDayOfMonth());
 		String month = String.format("%02d", LocalDateTime.now().getMonthValue());
-		
-		String dateAndMonth = month + "-" +date;
-		
+
+		String dateAndMonth = month + "-" + date;
+
 		List<String> dojNames = new ArrayList<>();
-		
+
 		List<User> users = userRepository.findAll();
 		for (User user : users) {
 			String userDoj = user.getDateOfJoining().split("-")[1] + "-" + user.getDateOfJoining().split("-")[2];
 			if (userDoj.equals(dateAndMonth)) {
-				dojNames.add(user.getFirstName() + user.getLastName());
+				String buName = businessUnitRepository.findById(user.getBusinessUnitId()).getBusinessUnitName();
+				dojNames.add(user.getFirstName() + user.getLastName() + "-" + buName);
 			}
 		}
 		return dojNames;
 	}
+
+	@Override
+	public Map<String, List<TimeSheetDto>> getApprovedHistory() {
+
+		List<TimeSheet> documents = timeSheetRepository.findAll();
+		Map<String, List<TimeSheet>> groupedDocuments = documents.stream()
+				.sorted(Comparator.comparing(TimeSheet::getUpdatedDateTime).thenComparing(TimeSheet::getUpdatedDateTime))
+				.collect(Collectors.groupingBy(TimeSheet::getDate));
+		Map<String, List<TimeSheetDto>> res = new HashMap<>();
+
+		for (Map.Entry<String, List<TimeSheet>> entry : groupedDocuments.entrySet()) {
+			List<TimeSheet> value = entry.getValue();
+			String key = entry.getKey();
+			List<TimeSheetDto> timeSheetDtoList = new ArrayList<>();
+			for (TimeSheet timeSheet : value) {
+				try {
+					if (key.equals(timeSheet.getDate()) && timeSheet.getApprovedByManager().equals("Approved"))
+						timeSheetDtoList.add(this.getTimeSheetDto(timeSheet));
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			res.put(key, timeSheetDtoList);
+		}
+
+		return res;
+	}
+
+	@Override
+	public Map<String, List<TimeSheetDto>> getRejectedHistory() {
+		List<TimeSheet> documents = timeSheetRepository.findAll();
+		Map<String, List<TimeSheet>> groupedDocuments = documents.stream()
+				.sorted(Comparator.comparing(TimeSheet::getUpdatedDateTime).thenComparing(TimeSheet::getUpdatedDateTime))
+				.collect(Collectors.groupingBy(TimeSheet::getDate));
+		Map<String, List<TimeSheetDto>> res = new HashMap<>();
+
+		for (Map.Entry<String, List<TimeSheet>> entry : groupedDocuments.entrySet()) {
+			List<TimeSheet> value = entry.getValue();
+			String key = entry.getKey();
+			List<TimeSheetDto> timeSheetDtoList = new ArrayList<>();
+			for (TimeSheet timeSheet : value) {
+				try {
+					if (key.equals(timeSheet.getDate()) && timeSheet.getApprovedByManager().equals("Rejected"))
+						timeSheetDtoList.add(this.getTimeSheetDto(timeSheet));
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			res.put(key, timeSheetDtoList);
+
+		}
+
+		return res;
+	}
+
 }

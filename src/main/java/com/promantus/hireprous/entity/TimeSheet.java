@@ -31,6 +31,7 @@ public class TimeSheet {
 	private String calHrs;
 	private String description;
 	private boolean isSubmittedForApproval;
+	private boolean billable;
 	private String timesheetStatus;
 	private String comments;
 	
@@ -165,6 +166,12 @@ public class TimeSheet {
 	}
 	public void setHours(Double hours) {
 		this.hours = hours;
+	}
+	public boolean isBillable() {
+		return billable;
+	}
+	public void setBillable(boolean billable) {
+		this.billable = billable;
 	}
 	
 		

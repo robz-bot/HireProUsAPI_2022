@@ -100,12 +100,12 @@ public class CandidateController extends CommonController {
 			// Experience.
 			if (candidateDto.getExperience() == null || candidateDto.getExperience().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", Experience" : "Experience");
-			}
+			}                                    
 
 			if (errorParam.length() > 0) {
 				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 				resultDto.setMessage(
-						super.getMessage("mandatory.input.param", new String[] { errorParam.toString() }, lang));
+					super.getMessage("mandatory.input.param", new String[] { errorParam.toString() }, lang));
 
 				logger.info(resultDto.getMessage());
 				return resultDto;
@@ -119,7 +119,7 @@ public class CandidateController extends CommonController {
 			resultDto.setMessage(e.getMessage());
 
 			logger.error(HireProUsUtil.getErrorMessage(e));
-		}
+		}          
 
 		return resultDto;
 	}
@@ -144,6 +144,7 @@ public class CandidateController extends CommonController {
 			// Job Request Number
 			if (candidateDto.getJrNumber() == null || candidateDto.getJrNumber().isEmpty()) {
 				errorParam.append("Job Request Number");
+				
 			}
 			// First Name.
 			if (candidateDto.getFirstName() == null || candidateDto.getFirstName().isEmpty()) {
@@ -168,7 +169,7 @@ public class CandidateController extends CommonController {
 			// SkillSet.
 			if (candidateDto.getSkillSet() == null || candidateDto.getSkillSet().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", SkillSet" : "SkillSet");
-			}
+			}   
 			// Experience.
 			if (candidateDto.getExperience() == null || candidateDto.getExperience().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", Experience" : "Experience");
@@ -178,7 +179,7 @@ public class CandidateController extends CommonController {
 				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 				resultDto.setMessage(
 						super.getMessage("mandatory.input.param", new String[] { errorParam.toString() }, lang));
-
+				
 				logger.info(resultDto.getMessage());
 				return resultDto;
 			}
@@ -207,6 +208,7 @@ public class CandidateController extends CommonController {
 		CandidateDto resultDto = new CandidateDto();
 		try {
 
+				
 			// Mandatory check.
 			StringBuilder errorParam = new StringBuilder();
 			// Candidate Id.
@@ -217,6 +219,7 @@ public class CandidateController extends CommonController {
 			if (candidateDto.getRecStatus() == null || candidateDto.getRecStatus().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", Status" : "Status");
 			}
+			
 			// Remarks.
 			if (candidateDto.getRemarks() == null || candidateDto.getRemarks().isEmpty()) {
 				errorParam.append(errorParam.length() > 0 ? ", Remarks" : "Remarks");

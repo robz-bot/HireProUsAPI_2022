@@ -6,6 +6,7 @@ import java.util.Map;
 import com.promantus.hireprous.dto.SearchDto;
 import com.promantus.hireprous.dto.TimeSheetDto;
 import com.promantus.hireprous.dto.UserDto;
+import com.promantus.hireprous.entity.TimeSheet;
 
 public interface TimeSheetService {
 
@@ -38,5 +39,11 @@ public interface TimeSheetService {
 	List<String> getAllDateOfBirth() throws Exception;
 
 	List<String> getAllDateOfJoining() throws Exception;
+
+	Map<String, List<TimeSheetDto>> getApprovedHistory();
+
+	Map<String, Double> getBillable(long parseLong);
+
+	Map<String, List<TimeSheetDto>> getRejectedHistory();
 	
 }

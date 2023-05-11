@@ -29,6 +29,7 @@ public class TimeSheetDto implements Serializable{
 	private LocalDateTime createdDateTime;
 	private Long updatedBy;
 	private LocalDateTime updatedDateTime;
+	private boolean billable;
 	
 	private int status;
 	private String message;
@@ -197,6 +198,12 @@ public class TimeSheetDto implements Serializable{
 	}
 	public void setHours(Double hours) {
 		this.hours = hours;
+	}
+	public boolean isBillable() {
+		return billable;
+	}
+	public void setBillable(boolean billable) {
+		this.billable = billable;
 	}
 	
 }
