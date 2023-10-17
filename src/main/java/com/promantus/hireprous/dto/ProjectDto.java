@@ -32,7 +32,6 @@ public class ProjectDto implements Serializable {
 	private long updatedBy;
 	private String updatedByName;
 	private LocalDateTime updatedDateTime;
-	private String projStatus;
 
 	private int status;
 	private String message;
@@ -231,13 +230,5 @@ public class ProjectDto implements Serializable {
 	 */
 	public void setMessage(String message) {
 		this.message = message;
-	}
-
-	public String getProjStatus() {
-		return projStatus;
-	}
-
-	public void setProjStatus(String projStatus) {
-		this.projStatus = projStatus;
 	}
 }

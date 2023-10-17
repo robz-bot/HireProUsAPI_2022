@@ -85,6 +85,15 @@ public interface CandidateService {
 	CandidateDto updateRecStatus(final CandidateDto candidateDto, String lang) throws Exception;
 
 	/**
+	 * @param candidateDto
+	 * @param lang
+	 * @return
+	 * @throws Exception
+	 */
+	CandidateDto updateAIRecStatus(final CandidateDto candidateDto, String lang) throws Exception;
+
+	
+	/**
 	 * @param userId
 	 * @return
 	 * @throws Exception

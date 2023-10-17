@@ -150,9 +150,7 @@ public class BusinessUnitServiceImpl implements BusinessUnitService {
 	@Override
 	public Boolean checkBUName(String buName, long managerId) throws Exception {
 
-//		if (businessUnitRepository.getBusinessUnitByBusinessUnitNameAndManagerIdIgnoreCase(buName,managerId) != null) {
-//		Bug fixed - Unable to add and edit in Business unit - added on 05/11/2022
-		if (businessUnitRepository.getBusinessUnitByBusinessUnitNameAndManagerId(buName,managerId) != null) {
+		if (businessUnitRepository.getBusinessUnitByBusinessUnitNameAndManagerIdIgnoreCase(buName,managerId) != null) {
 			return true;
 		}
 

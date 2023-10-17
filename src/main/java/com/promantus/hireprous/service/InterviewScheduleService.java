@@ -23,6 +23,9 @@ public interface InterviewScheduleService {
 	 */
 	InterviewScheduleDto addInterviewSchedule(final InterviewScheduleDto interviewScheduleDto, String lang)
 			throws Exception;
+	
+	void addAIInterviewSchedule(final InterviewScheduleDto interviewScheduleDto, String lang)
+			throws Exception;
 
 	/**
 	 * @param interviewScheduleDto

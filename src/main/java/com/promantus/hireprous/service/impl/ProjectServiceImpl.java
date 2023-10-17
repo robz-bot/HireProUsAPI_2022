@@ -90,7 +90,6 @@ public class ProjectServiceImpl implements ProjectService {
 
 		project.setCreatedBy(projectDto.getCreatedBy());
 		project.setUpdatedBy(projectDto.getUpdatedBy());
-		project.setProjStatus(projectDto.getProjStatus());
 		project.setCreatedDateTime(LocalDateTime.now());
 		project.setUpdatedDateTime(LocalDateTime.now());
 
@@ -135,7 +134,6 @@ public class ProjectServiceImpl implements ProjectService {
 
 		project.setBusinessUnitId(projectDto.getBusinessUnitId());
 		project.setCustomerId(projectDto.getCustomerId());
-		project.setProjStatus(projectDto.getProjStatus());
 
 		project.setUpdatedBy(projectDto.getUpdatedBy());
 		project.setUpdatedDateTime(LocalDateTime.now());
@@ -226,7 +224,6 @@ public class ProjectServiceImpl implements ProjectService {
 		projectDto.setCustomerName(customerService.getCustomerNameById(project.getCustomerId()));
 
 		projectDto.setCreatedBy(project.getCreatedBy());
-		projectDto.setProjStatus(project.getProjStatus());
 		projectDto.setCreatedByName(CacheUtil.getUsersMap().get(project.getCreatedBy()));
 		projectDto.setCreatedDateTime(HireProUsUtil.getGMTDateTime(project.getCreatedDateTime()));
 

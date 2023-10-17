@@ -67,7 +67,7 @@ import com.promantus.hireprous.util.HireProUsUtil;
 public class CandidateServiceImpl implements CandidateService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CandidateServiceImpl.class);
-	
+
 	@Autowired
 	RecruitmentRoleRepository recruitmentRepository;
 
@@ -98,10 +98,9 @@ public class CandidateServiceImpl implements CandidateService {
 	@Autowired
 	CandidateRepository candidateRepository;
 
-	
 	@Autowired
 	JobRequestRepository jobRequestRepository;
-	
+
 	@Autowired
 	InterviewScheduleRepository interviewScheduleRepository;
 
@@ -189,7 +188,6 @@ public class CandidateServiceImpl implements CandidateService {
 
 		interviewScheduleDto.setCreatedBy(candidate.getCreatedBy());
 		interviewScheduleDto.setUpdatedBy(candidate.getUpdatedBy());
-
 		interviewScheduleService.addInterviewSchedule(interviewScheduleDto, lang);
 
 		// Update JR status.
@@ -250,31 +248,26 @@ public class CandidateServiceImpl implements CandidateService {
 		if (candidatesListCheck != null && candidatesListCheck.size() > 0) {
 			for (Candidate candidate2 : candidatesListCheck) {
 				if (candidateDto.getId().equals(candidate2.getId())) {
-					/*if (candidateDto.getEmail().equals(candidate2.getEmail())) {
-						resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
-						resultDto
-								.setMessage(commonService.getMessage("already.exists", new String[] { "Email" }, lang));
-
-						logger.info(resultDto.getMessage());
-						return resultDto;
-					}
-					if (candidateDto.getContactNumber().equals(candidate2.getContactNumber())) {
-						resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
-						resultDto.setMessage(
-								commonService.getMessage("already.exists", new String[] { "Contact Number" }, lang));
-
-						logger.info(resultDto.getMessage());
-						return resultDto;
-						// }
-					}
-					if (candidateDto.getJrNumber().equals(candidate2.getJrNumber())) {
-						resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
-						resultDto
-								.setMessage(commonService.getMessage("already.exists", new String[] { "Jr Number" }, lang));
-
-						logger.info(resultDto.getMessage());
-						return resultDto;
-					}*/
+					/*
+					 * if (candidateDto.getEmail().equals(candidate2.getEmail())) {
+					 * resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR); resultDto
+					 * .setMessage(commonService.getMessage("already.exists", new String[] { "Email"
+					 * }, lang));
+					 * 
+					 * logger.info(resultDto.getMessage()); return resultDto; } if
+					 * (candidateDto.getContactNumber().equals(candidate2.getContactNumber())) {
+					 * resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+					 * resultDto.setMessage( commonService.getMessage("already.exists", new String[]
+					 * { "Contact Number" }, lang));
+					 * 
+					 * logger.info(resultDto.getMessage()); return resultDto; // } } if
+					 * (candidateDto.getJrNumber().equals(candidate2.getJrNumber())) {
+					 * resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR); resultDto
+					 * .setMessage(commonService.getMessage("already.exists", new String[] {
+					 * "Jr Number" }, lang));
+					 * 
+					 * logger.info(resultDto.getMessage()); return resultDto; }
+					 */
 				}
 			}
 		}
@@ -2179,7 +2172,7 @@ public class CandidateServiceImpl implements CandidateService {
 		final List<Criteria> criteriaList = new ArrayList<>();
 		if (candidateDto.getRecStatus() != null && !candidateDto.getRecStatus().isEmpty()) {
 			List<String> recStatusList = Arrays.asList(candidateDto.getRecStatus().split(","));
-		System.out.println(	criteriaList.add(Criteria.where("recStatus").in(recStatusList)));
+			System.out.println(criteriaList.add(Criteria.where("recStatus").in(recStatusList)));
 		}
 
 		if (candidateDto.getJrNumber() != null && !candidateDto.getJrNumber().isEmpty()) {
@@ -2289,7 +2282,7 @@ public class CandidateServiceImpl implements CandidateService {
 		}
 		interview.setJrNumber(jrNumber);
 		interview.setCandidateId(getNewCandidate.getId());
-    	interview.setInterviewerId(candidateDto.getUpdatedBy());
+		interview.setInterviewerId(candidateDto.getUpdatedBy());
 		interview.setScheduleDateTime(LocalDateTime.now());
 		interview.setDuration("0");
 		interview.setScheduleRemarks("For Resume Shortlist");
@@ -2327,36 +2320,100 @@ public class CandidateServiceImpl implements CandidateService {
 
 	@Override
 	public EvaluateResumeDto getEvaluateResume(String jrNumber, String candidateId) {
-		
+
 		EvaluateResumeDto resultDto = new EvaluateResumeDto();
-		 
+
 		Candidate candidateDet = candidateRepository.findById(Long.parseLong(candidateId));
 		try {
-		if(candidateDet !=null) {
-			resultDto.setCandiDesig(candidateDet.getCurrentDesignation());
-			resultDto.setCandiId(candidateDet.getId());
-			resultDto.setCandiName(candidateDet.getFirstName() + " " + candidateDet.getLastName());
-			resultDto.setCandiSkillset(candidateDet.getSkillSet().replaceAll(",", " "));
-			resultDto.setCandiYOE(candidateDet.getExperience());
-		}
-		
-		JobRequest jobReqDet = jobRequestRepository.getJobRequestByReferenceNumber(jrNumber);
-		RecruitmentRole recRoleDet = recruitmentRepository.findById(jobReqDet.getRoleId());
-		
-		if(jobReqDet !=null) {
-			//resultDto.setCandiDesig(candidateDet.get);
-			resultDto.setJdDesig(recRoleDet.getRecruitmentRoleName());
-			resultDto.setJdNum(jrNumber);
-			resultDto.setJdSkillset(jobReqDet.getMandatorySkills() + " " +jobReqDet.getOptionalSkills());
-			resultDto.setJdYOE(jobReqDet.getMinYearOfExp());
-		}
-		}
-		catch(Exception E){
+			if (candidateDet != null) {
+				resultDto.setCandiDesig(candidateDet.getCurrentDesignation());
+				resultDto.setCandiId(candidateDet.getId());
+				resultDto.setCandiName(candidateDet.getFirstName() + " " + candidateDet.getLastName());
+				resultDto.setCandiSkillset(candidateDet.getSkillSet().replaceAll(",", " "));
+				resultDto.setCandiYOE(candidateDet.getExperience());
+			}
+
+			JobRequest jobReqDet = jobRequestRepository.getJobRequestByReferenceNumber(jrNumber);
+			RecruitmentRole recRoleDet = recruitmentRepository.findById(jobReqDet.getRoleId());
+
+			if (jobReqDet != null) {
+				// resultDto.setCandiDesig(candidateDet.get);
+				resultDto.setJdDesig(recRoleDet.getRecruitmentRoleName());
+				resultDto.setJdNum(jrNumber);
+				resultDto.setJdSkillset(jobReqDet.getMandatorySkills() + " " + jobReqDet.getOptionalSkills());
+				resultDto.setJdYOE(jobReqDet.getMinYearOfExp());
+			}
+		} catch (Exception E) {
 			System.out.print(E);
 		}
 		return resultDto;
-		
+
 	}
 
-	
+	@Override
+	public CandidateDto updateAIRecStatus(CandidateDto candidateDto, String lang) throws Exception {
+		CandidateDto resultDto = new CandidateDto();
+
+		Candidate candidate = candidateRepository.findById(candidateDto.getId());
+
+		if (candidate == null) {
+
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+			resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+			logger.info(resultDto.getMessage());
+			return resultDto;
+		}
+
+		candidate.setRecStatus(candidateDto.getRecStatus());
+
+		candidate.setUpdatedBy(candidateDto.getUpdatedBy());
+		candidate.setUpdatedDateTime(LocalDateTime.now());
+
+		candidateRepository.save(candidate);
+
+		// Update in Interview schedule for status update.
+		InterviewSchedule interviewSchedule = new InterviewSchedule();
+		interviewSchedule.setId(commonService.nextSequenceNumber());
+		interviewSchedule.setJrNumber(candidate.getJrNumber());
+		interviewSchedule.setCandidateId(candidate.getId());
+		interviewSchedule.setInterviewerId(candidate.getUpdatedBy());
+		interviewSchedule.setScheduleDateTime(LocalDateTime.now());
+
+		interviewSchedule.setDuration("0");
+		interviewSchedule.setScheduleRemarks("For Resume Shortlist");
+
+		interviewSchedule.setMode("Remote");
+		interviewSchedule.setVenue("System");
+
+		interviewSchedule.setRound(HireProUsConstants.INTERVIEW_ROUND_INITIAL);
+		interviewSchedule.setRecStatus(HireProUsConstants.REC_STATUS_SHORTLISTED_0);
+		interviewSchedule.setCompleted(0);
+
+		interviewSchedule.setCreatedBy(candidate.getCreatedBy());
+		interviewSchedule.setUpdatedBy(candidate.getUpdatedBy());
+		interviewSchedule.setCreatedDateTime(LocalDateTime.now());
+		interviewSchedule.setUpdatedDateTime(LocalDateTime.now());
+		interviewScheduleRepository.save(interviewSchedule);
+
+//		interviewScheduleService.updateShortlistedResult(interviewScheduleDto, lang);
+
+		// Send Resume Shortlisted Mail.
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					mailService.sendResumeShortlistedEmail(candidate, candidateDto.getRemarks());
+				} catch (Exception e) {
+
+					logger.error("Email for Resume shortlist is not Sent.");
+					logger.error(HireProUsUtil.getErrorMessage(e));
+				}
+			}
+		}).start();
+
+		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
+		return resultDto;
+	}
+
 }

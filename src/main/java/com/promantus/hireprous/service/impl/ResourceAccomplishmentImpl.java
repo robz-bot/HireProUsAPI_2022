@@ -52,6 +52,7 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 		List<ResourceAccomplishment> resourceAccomplishmentList = new ArrayList<ResourceAccomplishment>();
 		resourceAccomplishmentList = resourceAccomplishmentRepository.findByResourceName(
 				resourceAccomplishmentDto.getResourceName(), HireProUsUtil.orderByUpdatedDateTimeDesc());
+<<<<<<< Updated upstream
 		if (resourceAccomplishmentList.size() > 0) {
 			for (ResourceAccomplishment resourceAccomplishment : resourceAccomplishmentList) {
 				// 2022-03-31 - 2023-03-08
@@ -63,6 +64,21 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 					resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
 					resultDto.setMessage("Entry Added Successfully");
 				}
+=======
+
+		if (resourceAccomplishmentList.size() > 0) {
+			ResourceAccomplishment resourceAccomplishment = resourceAccomplishmentList.get(0);
+			LocalDateTime updatedDT = resourceAccomplishment.getUpdatedDateTime();
+
+			if (currentDT.getMonthValue() > updatedDT.getMonthValue() && currentDT.getYear() >= updatedDT.getYear()) {
+				addNewEntry(resourceAccomplishmentDto);
+				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
+				resultDto.setMessage("Entry Added Successfully");
+
+			} else {
+				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage("Entry already exist for this month");
+>>>>>>> Stashed changes
 			}
 
 		} else {
@@ -71,30 +87,14 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 			resultDto.setMessage("Entry Added Successfully");
 		}
 
-//		if (resourceAccomplishmentList.size() > 0) {
-//			ResourceAccomplishment resourceAccomplishment = resourceAccomplishmentList.get(0);
-//			LocalDateTime updatedDT = resourceAccomplishment.getUpdatedDateTime();
-//
-//			if (currentDT.getMonthValue() > updatedDT.getMonthValue() && currentDT.getYear() >= updatedDT.getYear()) {
-//				addNewEntry(resourceAccomplishmentDto);
-//				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
-//				resultDto.setMessage("Entry Added Successfully");
-//
-//			} else {
-//				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
-//				resultDto.setMessage("Entry already exist for this month");
-//			}
-//	}
-//
-//		else {
-//			addNewEntry(resourceAccomplishmentDto);
-//			resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
-//			resultDto.setMessage("Entry added");
-//
-//		}
+		else {
+			addNewEntry(resourceAccomplishmentDto);
+			resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
+			resultDto.setMessage("Entry added");
+
+		}
 
 		return resultDto;
-
 	}
 
 	@SuppressWarnings("unused")
@@ -198,7 +198,6 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 
 		return resourceAccomplishmentDtoList;
 	}
-
 	@Override
 	public List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuId(Long buId) throws Exception {
 
@@ -208,6 +207,7 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 		resourceAccomplishmentList = resourceAccomplishmentRepository.findByBuId(buId);
 		int index = 0;
 		for (ResourceAccomplishment resourceAccomplishment : resourceAccomplishmentList) {
+<<<<<<< Updated upstream
 			index++;
 			resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment, index));
 
@@ -229,6 +229,9 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 				index++;
 				resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment, index));
 			}
+=======
+			resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment));
+>>>>>>> Stashed changes
 		}
 
 		return resourceAccomplishmentDtoList;
@@ -323,9 +326,8 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 		List<ResourceAccomplishment> getResByname = new ArrayList<ResourceAccomplishment>();
 		getResByname = resourceAccomplishmentRepository.findByResourceName(name);
 		ResourceAccomplishmentDto resultDto = new ResourceAccomplishmentDto();
-
-		for (ResourceAccomplishment resourceAccomplishment : getResByname) {
-			if (resourceAccomplishment.getCreatedDateTime().getYear() == Integer.parseInt(year)) {
+		if (getResByname != null) {
+			if (getResByname.get(0).getCreatedDateTime().getYear() == Integer.parseInt(year)) {
 				resultDto.setMessage("Already Record Exsits for this year: " + year);
 				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 			} else {
@@ -333,16 +335,6 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
 			}
 		}
-
-//		if (getResByname != null) {
-//			if (getResByname.get(0).getCreatedDateTime().getYear() == Integer.parseInt(year)) {
-//				resultDto.setMessage("Already Record Exsits for this year: " + year);
-//				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
-//			} else {
-//				resultDto.setMessage("Record Doesn't Exsits for this year: " + year);
-//				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
-//			}
-//		}
 		return resultDto;
 
 	}

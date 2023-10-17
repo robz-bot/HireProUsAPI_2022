@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.mail.Message;
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
@@ -1335,15 +1337,18 @@ public class MailServiceImpl implements MailService {
 	@Override
 	public void sendInviteMail() throws Exception {
 
-//		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 //		mailSender.setUsername("hirepro.v1@gmail.com");
 //		mailSender.setPassword("hirepro@123");
-//		Properties properties = new Properties();
-//		properties.put("mail.smtp.auth", "true");
-//		properties.put("mail.smtp.starttls.enable", "true");
-//		properties.put("mail.smtp.host", "smtp-mail.outlook.com");
-//		properties.put("mail.smtp.port", "587");
-//		mailSender.setJavaMailProperties(properties);
+		mailSender.setUsername("digitalteam@promantus.com");
+		mailSender.setPassword("Pro@8566");
+		Properties properties = new Properties();
+		properties.put("mail.smtp.auth", "true");
+		properties.put("mail.smtp.starttls.enable", "true");
+		properties.put("mail.smtp.host", "smtp-mail.outlook.com");
+		properties.put("mail.smtp.port", "587");
+		mailSender.setJavaMailProperties(properties);
+		mailSender.getSession().setDebug(true);
 
 		this.sendCalendarInvite(adminEmail, new CalendarRequest.Builder().withSubject("HireProUs Test Meeting Invite.")
 				.withBody("This is a test event.")
