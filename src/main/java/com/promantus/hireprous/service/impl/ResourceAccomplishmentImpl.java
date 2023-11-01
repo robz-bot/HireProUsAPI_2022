@@ -52,7 +52,7 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 		List<ResourceAccomplishment> resourceAccomplishmentList = new ArrayList<ResourceAccomplishment>();
 		resourceAccomplishmentList = resourceAccomplishmentRepository.findByResourceName(
 				resourceAccomplishmentDto.getResourceName(), HireProUsUtil.orderByUpdatedDateTimeDesc());
-<<<<<<< Updated upstream
+
 		if (resourceAccomplishmentList.size() > 0) {
 			for (ResourceAccomplishment resourceAccomplishment : resourceAccomplishmentList) {
 				// 2022-03-31 - 2023-03-08
@@ -64,11 +64,11 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 					resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
 					resultDto.setMessage("Entry Added Successfully");
 				}
-=======
+
 
 		if (resourceAccomplishmentList.size() > 0) {
-			ResourceAccomplishment resourceAccomplishment = resourceAccomplishmentList.get(0);
-			LocalDateTime updatedDT = resourceAccomplishment.getUpdatedDateTime();
+			ResourceAccomplishment resourceAccomplishment1 = resourceAccomplishmentList.get(0);
+			LocalDateTime updatedDT = resourceAccomplishment1.getUpdatedDateTime();
 
 			if (currentDT.getMonthValue() > updatedDT.getMonthValue() && currentDT.getYear() >= updatedDT.getYear()) {
 				addNewEntry(resourceAccomplishmentDto);
@@ -78,25 +78,19 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 			} else {
 				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 				resultDto.setMessage("Entry already exist for this month");
->>>>>>> Stashed changes
 			}
 
 		} else {
 			addNewEntry(resourceAccomplishmentDto);
 			resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
 			resultDto.setMessage("Entry Added Successfully");
+			}
 		}
-
-		else {
-			addNewEntry(resourceAccomplishmentDto);
-			resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
-			resultDto.setMessage("Entry added");
-
-		}
-
+	  }
 		return resultDto;
+				
 	}
-
+			
 	@SuppressWarnings("unused")
 	@Override
 	public ResourceAccomplishmentDto updateResourceAccomplishment(ResourceAccomplishmentDto resourceAccomplishmentDto,
@@ -207,7 +201,7 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 		resourceAccomplishmentList = resourceAccomplishmentRepository.findByBuId(buId);
 		int index = 0;
 		for (ResourceAccomplishment resourceAccomplishment : resourceAccomplishmentList) {
-<<<<<<< Updated upstream
+
 			index++;
 			resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment, index));
 
@@ -229,9 +223,9 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 				index++;
 				resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment, index));
 			}
-=======
-			resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment));
->>>>>>> Stashed changes
+
+			resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment, index));
+
 		}
 
 		return resourceAccomplishmentDtoList;
@@ -338,5 +332,7 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 		return resultDto;
 
 	}
+
+	
 
 }

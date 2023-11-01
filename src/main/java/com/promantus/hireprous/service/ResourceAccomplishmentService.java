@@ -33,20 +33,11 @@ public interface ResourceAccomplishmentService {
 
 		ResourceAccomplishmentDto checkEntryValidity(String name,String year);
 
-<<<<<<< Updated upstream
 		List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuId(Long buId) throws Exception;
 		
 		List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuIdYear(Long buId,int year) throws Exception;
-=======
-		List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuId(long buId) throws Exception;
->>>>>>> Stashed changes
 
-		
-		
-		
-
-	
-		
+			
 
 	}
 
