@@ -303,6 +303,54 @@ public class CandidateController extends CommonController {
 
 		return resultDto;
 	}
+	
+	@PutMapping("/updateAIShortlistResultLst")
+	public CandidateDto updateAIShortlistResultLst(@RequestBody List<CandidateDto> candidateDto,
+			@RequestHeader(name = "lang", required = false) String lang) {
+
+		CandidateDto resultDto = new CandidateDto();
+		try {
+
+			// Mandatory check.
+//			StringBuilder errorParam = new StringBuilder();
+//			// Candidate Id.
+//			if (candidateDto.getId() == 0) {
+//				errorParam.append("Candidate Id");
+//			}
+//			// Recruitment Status
+//			if (candidateDto.getRecStatus() == null || candidateDto.getRecStatus().isEmpty()) {
+//				errorParam.append(errorParam.length() > 0 ? ", Status" : "Status");
+//			}
+//			// Remarks.
+//			if (candidateDto.getRemarks() == null || candidateDto.getRemarks().isEmpty()) {
+//				errorParam.append(errorParam.length() > 0 ? ", Remarks" : "Remarks");
+//			}
+//			// JR Number
+//			if (candidateDto.getJrNumber() == null || candidateDto.getJrNumber().isEmpty()) {
+//				errorParam.append(errorParam.length() > 0 ? ", JR Number" : "JR Number");
+//			}
+//
+//			if (errorParam.length() > 0) {
+//				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+//				resultDto.setMessage(
+//						super.getMessage("mandatory.input.param", new String[] { errorParam.toString() }, lang));
+//
+//				logger.info(resultDto.getMessage());
+//				return resultDto;
+//			}
+
+			resultDto = candidateService.updateAIRecStatusLst(candidateDto, lang);
+
+		} catch (final Exception e) {
+
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+			resultDto.setMessage(e.getMessage());
+
+			logger.error(HireProUsUtil.getErrorMessage(e));
+		}
+
+		return resultDto;
+	}
 
 	/**
 	 * @return

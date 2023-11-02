@@ -2416,4 +2416,70 @@ public class CandidateServiceImpl implements CandidateService {
 		return resultDto;
 	}
 
+	@Override
+	public CandidateDto updateAIRecStatusLst(List<CandidateDto> candidateDto, String lang) throws Exception {
+		CandidateDto resultDto = new CandidateDto();
+		for (CandidateDto candidateDto2 : candidateDto) {
+
+			Candidate candidate = candidateRepository.findById(candidateDto2.getId());
+
+			if (candidate == null) {
+
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			candidate.setRecStatus(candidateDto2.getRecStatus());
+
+			candidate.setUpdatedBy(candidateDto2.getUpdatedBy());
+			candidate.setUpdatedDateTime(LocalDateTime.now());
+
+			candidateRepository.save(candidate);
+
+			// Update in Interview schedule for status update.
+			InterviewSchedule interviewSchedule = new InterviewSchedule();
+			interviewSchedule.setId(commonService.nextSequenceNumber());
+			interviewSchedule.setJrNumber(candidate.getJrNumber());
+			interviewSchedule.setCandidateId(candidate.getId());
+			interviewSchedule.setInterviewerId(candidate.getUpdatedBy());
+			interviewSchedule.setScheduleDateTime(LocalDateTime.now());
+
+			interviewSchedule.setDuration("0");
+			interviewSchedule.setScheduleRemarks("For Resume Shortlist");
+
+			interviewSchedule.setMode("Remote");
+			interviewSchedule.setVenue("System");
+
+			interviewSchedule.setRound(HireProUsConstants.INTERVIEW_ROUND_INITIAL);
+			interviewSchedule.setRecStatus(HireProUsConstants.REC_STATUS_SHORTLISTED_0);
+			interviewSchedule.setCompleted(0);
+
+			interviewSchedule.setCreatedBy(candidate.getCreatedBy());
+			interviewSchedule.setUpdatedBy(candidate.getUpdatedBy());
+			interviewSchedule.setCreatedDateTime(LocalDateTime.now());
+			interviewSchedule.setUpdatedDateTime(LocalDateTime.now());
+			interviewScheduleRepository.save(interviewSchedule);
+
+			// Send Resume Shortlisted Mail.
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						mailService.sendResumeShortlistedEmail(candidate, candidateDto2.getRemarks());
+					} catch (Exception e) {
+
+						logger.error("Email for Resume shortlist is not Sent.");
+						logger.error(HireProUsUtil.getErrorMessage(e));
+					}
+				}
+			}).start();
+		}
+
+		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
+		return resultDto;
+	}
+
 }

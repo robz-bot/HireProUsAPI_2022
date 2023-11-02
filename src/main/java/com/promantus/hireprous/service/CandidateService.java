@@ -228,6 +228,8 @@ public interface CandidateService {
 	// Added on 1/5/2022
 	CandidateDto rejectToUploadedStatus(CandidateDto candidateDto, String jrNumber, String lang);EvaluateResumeDto getEvaluateResume(String jrNumber, String candidateId);
 
+	CandidateDto updateAIRecStatusLst(List<CandidateDto> candidateDto, String lang) throws Exception;
+
 	
 
 }
