@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -261,9 +263,8 @@ public class DashboardServiceImpl implements DashboardService {
 		// Send result by count wise reverse order.
 		Comparator<BUsCountDto> countSorter = (a, b) -> a.getCount().compareTo(b.getCount());
 		Collections.sort(resultDtoList, countSorter.reversed());
-		for(int i=0;i<resultDtoList.size(); i++)
-		{
-         System.out.println(resultDtoList.get(i).getCount());
+		for (int i = 0; i < resultDtoList.size(); i++) {
+			System.out.println(resultDtoList.get(i).getCount());
 		}
 
 		return resultDtoList;
@@ -278,15 +279,17 @@ public class DashboardServiceImpl implements DashboardService {
 		for (BusinessUnit businessUnit : buList) {
 
 			BUsCountDto buCountDto = new BUsCountDto();
-		//	System.out.println(businessUnit.getId());
+			// System.out.println(businessUnit.getId());
 			buCountDto.setBuId(businessUnit.getId());
 			buCountDto.setBuName(businessUnit.getBusinessUnitName());
 
 			final List<Criteria> criteriaList = new ArrayList<>();
 			criteriaList.add(Criteria.where("buId").is(businessUnit.getId()));
-			/*criteriaList.add(Criteria.where("vendorId").is(Long.parseLong(vendorId)));
-			criteriaList.add(Criteria.where("recStatus").in(HireProUsConstants.REC_STATUS_SELECTED,
-					HireProUsConstants.REC_STATUS_ONBOARDED));*/
+			/*
+			 * criteriaList.add(Criteria.where("vendorId").is(Long.parseLong(vendorId)));
+			 * criteriaList.add(Criteria.where("recStatus").in(HireProUsConstants.
+			 * REC_STATUS_SELECTED, HireProUsConstants.REC_STATUS_ONBOARDED));
+			 */
 			criteriaList.add(Criteria.where("jobReqStatus").in(HireProUsConstants.JOB_REQUEST_STATUS_IN_PROGRESS,
 					HireProUsConstants.JOB_REQUEST_STATUS_YET_TO_START));
 
@@ -295,8 +298,8 @@ public class DashboardServiceImpl implements DashboardService {
 				Query searchQuery = new Query();
 				searchQuery.addCriteria(
 						new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()])));
-				jobRequestsList = mongoTemplate.find(searchQuery,JobRequest.class);
-			
+				jobRequestsList = mongoTemplate.find(searchQuery, JobRequest.class);
+
 			}
 
 			buCountDto.setCount((long) jobRequestsList.size());
@@ -305,7 +308,7 @@ public class DashboardServiceImpl implements DashboardService {
 			long inprogress = 0;
 			List<String> jrNumber = new ArrayList<String>();
 			for (JobRequest jobRequest : jobRequestsList) {
-				
+
 				if (jobRequest.getJobReqStatus().equals(HireProUsConstants.JOB_REQUEST_STATUS_IN_PROGRESS)) {
 					inprogress += 1;
 				} else if (jobRequest.getJobReqStatus().equals(HireProUsConstants.JOB_REQUEST_STATUS_YET_TO_START)) {
@@ -316,26 +319,25 @@ public class DashboardServiceImpl implements DashboardService {
 			}
 			buCountDto.setInprogress(inprogress);
 			buCountDto.setOpen(open);
-			List<JobRequest> jobRequest=jobRequestRepository.findByBuId(businessUnit.getId());
-			List<String> jrNumber2=new ArrayList<String>();
-			for(JobRequest jobrequest:jobRequest)
-			{
+			List<JobRequest> jobRequest = jobRequestRepository.findByBuId(businessUnit.getId());
+			List<String> jrNumber2 = new ArrayList<String>();
+			for (JobRequest jobrequest : jobRequest) {
 				jrNumber2.add(jobrequest.getReferenceNumber());
 			}
 
 			// Select Candidates.
-			//String recstatus="26";
+			// String recstatus="26";
 			List<Candidate> candidatesList = candidateRepository.findByJrNumberInAndVendorId(jrNumber2,
 					Long.parseLong(vendorId));
-				
+
 			long uploaded = 0;
 			long shortlisted = 0;
 			long holded = 0;
 			long rejected = 0;
 			long selected = 0;
 			long onboarded = 0;
-			long dropped=0;
-	
+			long dropped = 0;
+
 			for (Candidate candidate : candidatesList) {
 				String recStatus = candidate.getRecStatus();
 				if (recStatus.equals(HireProUsConstants.REC_STATUS_UPLOADED)) {
@@ -371,14 +373,12 @@ public class DashboardServiceImpl implements DashboardService {
 					onboarded += 1;
 				}
 
-				if(recStatus.equals(HireProUsConstants.REC_STATUS_DROPPED))
-				{
-					dropped+=1;
-				//	candidatesList.remove(index);
+				if (recStatus.equals(HireProUsConstants.REC_STATUS_DROPPED)) {
+					dropped += 1;
+					// candidatesList.remove(index);
 				}
 			}
-			buCountDto.setTotalTagged((long) candidatesList.size()-dropped);
-
+			buCountDto.setTotalTagged((long) candidatesList.size() - dropped);
 
 			buCountDto.setUploaded(uploaded);
 			buCountDto.setShortlisted(shortlisted);
@@ -394,7 +394,7 @@ public class DashboardServiceImpl implements DashboardService {
 		// Send result by count wise reverse order.
 		Comparator<BUsCountDto> countSorter = (a, b) -> a.getCount().compareTo(b.getCount());
 		Collections.sort(resultDtoList, countSorter.reversed());
-	
+
 		return resultDtoList;
 	}
 
@@ -415,7 +415,7 @@ public class DashboardServiceImpl implements DashboardService {
 		List<JobRequest> jobRequestList = jobRequestRepository.getJobRequestByJobReqStatusIn(
 				Arrays.asList(HireProUsConstants.JOB_REQUEST_STATUS_IN_PROGRESS,
 						HireProUsConstants.JOB_REQUEST_STATUS_YET_TO_START),
-						HireProUsUtil.orderByUpdatedDateTimeDesc());
+				HireProUsUtil.orderByUpdatedDateTimeDesc());
 
 		return this.getJobRequestAgingCount(jobRequestList);
 	}
@@ -593,5 +593,39 @@ public class DashboardServiceImpl implements DashboardService {
 	public List<JobRequestDto> getLatestJobRequestsForVendor(String vendorId, String lang) throws Exception {
 
 		return jobRequestService.getLatestJobRequestsForVendor(vendorId, lang);
+	}
+
+	@Override
+	public Map<String, Integer> getRecMenuCounts() {
+		List<InterviewSchedule> interviewSchedulesListForIR1 = new ArrayList<InterviewSchedule>();
+		
+//
+//			interviewSchedulesListForIR1 = interviewScheduleRepository
+//					.findByRecStatusAndCompleted(HireProUsConstants.REC_STATUS_SHORTLISTED_0, 0);
+//
+//		
+//
+//			interviewSchedulesList = interviewScheduleRepository.findByRecStatusAndCompleted(
+//					HireProUsConstants.REC_STATUS_PASSED_R1, 0, HireProUsUtil.orderByUpdatedDateTimeDesc());
+//
+//		
+//
+//			interviewSchedulesList = interviewScheduleRepository.findByRecStatusAndCompleted(
+//					HireProUsConstants.REC_STATUS_PASSED_R2, 0, HireProUsUtil.orderByUpdatedDateTimeDesc());
+//
+//		
+//
+//			interviewSchedulesList = interviewScheduleRepository.findByRecStatusAndCompleted(
+//					HireProUsConstants.REC_STATUS_PASSED_CR3, 0, HireProUsUtil.orderByUpdatedDateTimeDesc());
+//
+//		
+//
+//			interviewSchedulesList = interviewScheduleRepository.findByRecStatusAndCompleted(
+//					HireProUsConstants.REC_STATUS_PASSED_HR4, 0, HireProUsUtil.orderByUpdatedDateTimeDesc());
+		
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		result.put("BUCount", interviewScheduleRepository
+				.findByRecStatusAndCompleted(HireProUsConstants.REC_STATUS_PASSED_HR4, 0).size());
+		return result;
 	}
 }

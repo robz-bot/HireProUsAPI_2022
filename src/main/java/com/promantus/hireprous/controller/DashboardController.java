@@ -5,7 +5,9 @@
 package com.promantus.hireprous.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,5 +204,14 @@ public class DashboardController extends CommonController {
 		}
 
 		return new ArrayList<CandidateStatusDto>();
+	}
+	
+	@GetMapping("/getRecMenuCounts")
+	public Map<String,Integer> getAllCandidateStagesByBU(){
+		
+		
+		
+		
+		return dashboardService.getRecMenuCounts();
 	}
 }
