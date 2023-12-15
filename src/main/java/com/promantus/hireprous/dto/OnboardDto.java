@@ -68,6 +68,16 @@ public class OnboardDto implements Serializable {
 	private String experience;
 
 	private Long resourceId;
+	
+	private String offerAccepted;
+
+	public String getOfferAccepted() {
+		return offerAccepted;
+	}
+
+	public void setOfferAccepted(String offerAccepted) {
+		this.offerAccepted = offerAccepted;
+	}
 
 	/**
 	 * @return the id

@@ -277,6 +277,9 @@ public final class HireProUsConstants {
 
 	/** REC_STATUS_DROPPED - '26'. */
 	public static final String REC_STATUS_DROPPED = "26";
+	
+	/** REC_STATUS_OFFER_DECLINED - '27'. */
+	public static final String REC_STATUS_OFFER_DECLINED = "27";
 
 	// Mail Purpose
 	// --------------------------------------------------------------------------

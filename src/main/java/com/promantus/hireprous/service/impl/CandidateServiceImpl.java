@@ -552,6 +552,7 @@ public class CandidateServiceImpl implements CandidateService {
 		long selected = 0;
 		long onboarded = 0;
 		long dropped = 0;
+		long offerRejected = 0;
 		for (Candidate candidate : candidatesList) {
 
 			String recStatus = candidate.getRecStatus();
@@ -590,6 +591,9 @@ public class CandidateServiceImpl implements CandidateService {
 			if (recStatus.equals(HireProUsConstants.REC_STATUS_DROPPED)) {
 				dropped += 1;
 			}
+			if (recStatus.equals(HireProUsConstants.REC_STATUS_OFFER_DECLINED)) {
+				offerRejected += 1;
+			}
 		}
 
 		resultDto.setUploaded(uploaded);
@@ -599,6 +603,7 @@ public class CandidateServiceImpl implements CandidateService {
 		resultDto.setSelected(selected);
 		resultDto.setOnboarded(onboarded);
 		resultDto.setDropped(dropped);
+		resultDto.setOfferRejected(offerRejected);;
 
 		return resultDto;
 	}
