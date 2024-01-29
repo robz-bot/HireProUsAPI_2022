@@ -183,4 +183,6 @@ public interface InterviewScheduleService {
 
 	List<InterviewScheduleDto> searchInterviewScheduleForDownload(InterviewScheduleDto interviewScheduleDto)
 			throws Exception;
+
+	List<InterviewScheduleDto> getInterviewScheduledList1(int parseInt, int interviewerId) throws Exception;
 }

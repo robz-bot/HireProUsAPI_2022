@@ -833,6 +833,42 @@ public class InterviewScheduleServiceImpl implements InterviewScheduleService {
 		return this.getInterviewScheduleDtoList(interviewSchedulesList);
 	}
 
+	//Interview Scheduler 1
+	@Override
+	public List<InterviewScheduleDto> getInterviewScheduledList1(final int round, int interviewerId) throws Exception {
+
+		List<InterviewSchedule> interviewSchedulesList = new ArrayList<InterviewSchedule>();
+		if (HireProUsConstants.INTERVIEW_ROUND_INTERNAL1 == round) {
+
+			interviewSchedulesList = interviewScheduleRepository.findByRecStatusAndInterviewerId(
+					HireProUsConstants.REC_STATUS_SCHEDULED_R1, interviewerId, HireProUsUtil.orderByUpdatedDateTimeDesc());
+
+		} else if (HireProUsConstants.INTERVIEW_ROUND_INTERNAL2 == round) {
+
+			interviewSchedulesList = interviewScheduleRepository.findByRecStatusAndInterviewerId(
+					HireProUsConstants.REC_STATUS_SCHEDULED_R2,interviewerId, HireProUsUtil.orderByUpdatedDateTimeDesc());
+
+			System.out.println("Seccond Round: " +interviewSchedulesList );
+		} else if (HireProUsConstants.INTERVIEW_ROUND_CUSTOMER == round) {
+
+			interviewSchedulesList = interviewScheduleRepository.findByRecStatusAndInterviewerId(
+					HireProUsConstants.REC_STATUS_SCHEDULED_CR3,interviewerId, HireProUsUtil.orderByUpdatedDateTimeDesc());
+
+		} else if (HireProUsConstants.INTERVIEW_ROUND_HR == round) {
+
+			interviewSchedulesList = interviewScheduleRepository.findByRecStatusAndInterviewerId(
+					HireProUsConstants.REC_STATUS_SCHEDULED_HR4,interviewerId, HireProUsUtil.orderByUpdatedDateTimeDesc());
+
+		} else if (HireProUsConstants.INTERVIEW_ROUND_BU == round) {
+
+			interviewSchedulesList = interviewScheduleRepository.findByRecStatus(
+					HireProUsConstants.REC_STATUS_SCHEDULED_BU, HireProUsUtil.orderByUpdatedDateTimeDesc());
+
+		}
+
+		return this.getInterviewScheduleDtoList(interviewSchedulesList);
+	}
+	
 	@Override
 	public List<InterviewScheduleDto> searchInterviewScheduledList(
 			final InterviewScheduleSearchDto interviewScheduleSearchDto, final int round) throws Exception {

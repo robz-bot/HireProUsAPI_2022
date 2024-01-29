@@ -118,4 +118,9 @@ public interface InterviewScheduleRepository extends MongoRepository<InterviewSc
 
 	InterviewSchedule findByJrNumberAndCandidateId(String jrNumber, Long id);
 
+	List<InterviewSchedule> findByRecStatusAndInterviewerId(String recStatusScheduledR1, int interviewerId,
+			Sort orderByUpdatedDateTimeDesc);
+
+	
+
 }
