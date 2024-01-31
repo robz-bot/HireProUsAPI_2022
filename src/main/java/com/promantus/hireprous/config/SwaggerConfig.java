@@ -4,6 +4,8 @@
  **********************************************************************************************/
 package com.promantus.hireprous.config;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,15 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SwaggerConfig {
 
 	private final String releaseVersion = "3.0.4";
+	
+	// Get the current date and time
+    LocalDateTime now = LocalDateTime.now();
+
+    // Define a custom date and time format
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
+    // Format the current date and time using the formatter
+    String formattedDateTime = now.format(formatter);
 
 	@Bean
 	public Docket hireProApi() {
@@ -41,7 +52,7 @@ public class SwaggerConfig {
 	 * @return
 	 */
 	private ApiInfo metaData() {
-		return new ApiInfoBuilder().title("HireProUs - Spring Boot REST API - " + releaseVersion)
+		return new ApiInfoBuilder().title("HireProUs - Spring Boot REST API - " + releaseVersion + " - Deployed On: " + formattedDateTime )
 				.description("\"An internal hiring web application of Promantus Private Limited, Chennai.\"")
 				.version(releaseVersion)
 //				.license("Promantus License Version 1.0").licenseUrl("https://promantusinc.com/licenses/LICENSE-1.0\"")
