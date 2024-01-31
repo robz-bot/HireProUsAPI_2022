@@ -5,6 +5,7 @@
 package com.promantus.hireprous.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.promantus.hireprous.dto.BUsCountDto;
 import com.promantus.hireprous.dto.JobRequestAgingCountDto;
@@ -102,5 +103,7 @@ public interface DashboardService {
 	 * @throws Exception
 	 */
 	List<JobRequestDto> getLatestJobRequestsForVendor(String vendorId, String lang) throws Exception;
+
+	Map<String, Integer> getRecMenuCounts();
 
 }

@@ -292,6 +292,20 @@ public class InterviewScheduleController extends CommonController {
 		return interviewSchedulesDtoList;
 	}
 
+	//Get Interview Scheduler 1
+	@GetMapping("/getInterviewScheduledList/{round}/{interviewerId}")
+	public List<InterviewScheduleDto> getInterviewScheduledList1(@PathVariable String round, @PathVariable String interviewerId,
+			@RequestHeader(name = "lang", required = false) String lang) {
+
+		List<InterviewScheduleDto> interviewSchedulesDtoList = new ArrayList<InterviewScheduleDto>();
+		try {
+			interviewSchedulesDtoList = interviewScheduleService.getInterviewScheduledList1(Integer.parseInt(round),Integer.parseInt(interviewerId));
+		} catch (final Exception e) {
+			logger.error(HireProUsUtil.getErrorMessage(e));
+		}
+
+		return interviewSchedulesDtoList;
+	}
 	/**
 	 * @return
 	 */

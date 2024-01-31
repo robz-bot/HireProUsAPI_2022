@@ -59,6 +59,8 @@ public interface InterviewScheduleRepository extends MongoRepository<InterviewSc
 	 */
 	List<InterviewSchedule> findByRecStatusAndCompleted(String recStatusShortlisted0, int i,
 			Sort orderByUpdatedDateTimeDesc);
+	
+	List<InterviewSchedule> findByRecStatusAndCompleted(String recStatusShortlisted0, int i);
 
 	/**
 	 * @param interviewerId
@@ -115,5 +117,10 @@ public interface InterviewScheduleRepository extends MongoRepository<InterviewSc
 	List<InterviewSchedule> findByInterviewerIdAndResultRemarksNull(Long interviewerId);
 
 	InterviewSchedule findByJrNumberAndCandidateId(String jrNumber, Long id);
+
+	List<InterviewSchedule> findByRecStatusAndInterviewerId(String recStatusScheduledR1, int interviewerId,
+			Sort orderByUpdatedDateTimeDesc);
+
+	
 
 }

@@ -64,4 +64,6 @@ public interface ResourceMgmtRepository extends MongoRepository<ResourceMgmt, St
 	List<ResourceMgmt> findByProjectAllocationAndBuIdAndResourceStatus(String string, Long buId,
 			String resourceStatusActive, Sort orderByUpdatedDateTimeDesc);
 
+	ResourceMgmt findByEmailIgnoreCase(String email);
+
 }

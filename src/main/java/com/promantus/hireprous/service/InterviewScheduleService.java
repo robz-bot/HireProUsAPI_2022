@@ -23,6 +23,9 @@ public interface InterviewScheduleService {
 	 */
 	InterviewScheduleDto addInterviewSchedule(final InterviewScheduleDto interviewScheduleDto, String lang)
 			throws Exception;
+	
+	void addAIInterviewSchedule(final InterviewScheduleDto interviewScheduleDto, String lang)
+			throws Exception;
 
 	/**
 	 * @param interviewScheduleDto
@@ -180,4 +183,6 @@ public interface InterviewScheduleService {
 
 	List<InterviewScheduleDto> searchInterviewScheduleForDownload(InterviewScheduleDto interviewScheduleDto)
 			throws Exception;
+
+	List<InterviewScheduleDto> getInterviewScheduledList1(int parseInt, int interviewerId) throws Exception;
 }

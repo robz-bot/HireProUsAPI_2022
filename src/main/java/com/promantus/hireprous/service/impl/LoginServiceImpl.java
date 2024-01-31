@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 
 import com.promantus.hireprous.HireProUsConstants;
 import com.promantus.hireprous.dto.UserDto;
+import com.promantus.hireprous.entity.ResourceMgmt;
 import com.promantus.hireprous.entity.Role;
 import com.promantus.hireprous.entity.User;
+import com.promantus.hireprous.repository.ResourceMgmtRepository;
 import com.promantus.hireprous.repository.UserRepository;
 import com.promantus.hireprous.service.BusinessUnitService;
 import com.promantus.hireprous.service.CommonService;
@@ -55,6 +57,9 @@ public class LoginServiceImpl implements LoginService {
 
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	ResourceMgmtRepository resourceMgmtRepository;
 
 	@Override
 	public UserDto login(final String userName, final String password, final String lang) throws Exception {
@@ -94,14 +99,8 @@ public class LoginServiceImpl implements LoginService {
 		resultDto.setFullName(user.getFirstName() + " " + user.getLastName());
 		resultDto.setDesignation(user.getDesignation());
 
-		resultDto.setManagerId(user.getManagerId());
-		resultDto.setManagerName(userRepository.findById(user.getManagerId()).getFirstName() + " "
-				+ userRepository.findById(user.getManagerId()).getLastName());
-
 		resultDto.setBusinessUnitId(user.getBusinessUnitId());
 		resultDto.setBusinessUnitName(businessUnitService.getBusinessUnitNameById(user.getBusinessUnitId()));
-		
-		resultDto.setMessage("Logged In Success");;
 
 		resultDto.setRoleId(user.getRoleId());
 		resultDto.setRoleName(roleService.getRoleNameById(user.getRoleId()));
@@ -113,6 +112,11 @@ public class LoginServiceImpl implements LoginService {
 			resultDto.setMainMenus(roleMenuMappingService.getMainMenusForLogin(role));
 			resultDto.setSubMenus(roleMenuMappingService.getSubMenusForLogin(role));
 		}
+		
+		ResourceMgmt resource = resourceMgmtRepository.findByEmailIgnoreCase(user.getEmail());
+		if(resource != null) {
+			resultDto.setUserType(resource.getEmploymentType());
+			}
 
 		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
 		return resultDto;

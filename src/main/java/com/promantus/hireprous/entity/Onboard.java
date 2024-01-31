@@ -46,6 +46,8 @@ public class Onboard {
 
 	private Long resourceId;
 	private String email;
+	
+	private boolean offerAccepted;
 
 	/**
 	 * @return the id
@@ -312,4 +314,14 @@ public class Onboard {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+	public boolean isOfferAccepted() {
+		return offerAccepted;
+	}
+
+	public void setOfferAccepted(boolean offerAccepted) {
+		this.offerAccepted = offerAccepted;
+	}
+	
+	
 }

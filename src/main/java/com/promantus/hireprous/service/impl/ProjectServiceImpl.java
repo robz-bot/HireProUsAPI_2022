@@ -6,7 +6,10 @@ package com.promantus.hireprous.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +90,6 @@ public class ProjectServiceImpl implements ProjectService {
 
 		project.setCreatedBy(projectDto.getCreatedBy());
 		project.setUpdatedBy(projectDto.getUpdatedBy());
-		project.setProjStatus(projectDto.getProjStatus());
 		project.setCreatedDateTime(LocalDateTime.now());
 		project.setUpdatedDateTime(LocalDateTime.now());
 
@@ -132,7 +134,6 @@ public class ProjectServiceImpl implements ProjectService {
 
 		project.setBusinessUnitId(projectDto.getBusinessUnitId());
 		project.setCustomerId(projectDto.getCustomerId());
-		project.setProjStatus(projectDto.getProjStatus());
 
 		project.setUpdatedBy(projectDto.getUpdatedBy());
 		project.setUpdatedDateTime(LocalDateTime.now());
@@ -223,7 +224,6 @@ public class ProjectServiceImpl implements ProjectService {
 		projectDto.setCustomerName(customerService.getCustomerNameById(project.getCustomerId()));
 
 		projectDto.setCreatedBy(project.getCreatedBy());
-		projectDto.setProjStatus(project.getProjStatus());
 		projectDto.setCreatedByName(CacheUtil.getUsersMap().get(project.getCreatedBy()));
 		projectDto.setCreatedDateTime(HireProUsUtil.getGMTDateTime(project.getCreatedDateTime()));
 
@@ -327,5 +327,23 @@ public class ProjectServiceImpl implements ProjectService {
 
 		return projectDtoList;
 	}
-	
+
+	@Override
+	public List<String> getAllProjectName() throws Exception {
+		
+		List<Project> projectsList = projectRepository.findAll();
+		
+		Map<Long, String> result = new HashMap<>();
+		
+		for (Project project : projectsList) {
+			
+			result.put(project.getId(), project.getProjectName());
+		}
+		List<Map.Entry<Long,String>> entryList = new ArrayList<>(result.entrySet());
+		
+		List<String> valueList = entryList.stream()
+		        .map(entry -> entry.getKey() + ": " + entry.getValue())
+		        .collect(Collectors.toList());
+		return valueList;
+ }	
 }

@@ -13,7 +13,6 @@ import com.promantus.hireprous.HireProUsConstants;
 import com.promantus.hireprous.dto.ResourceAccomplishmentDto;
 import com.promantus.hireprous.entity.BusinessUnit;
 import com.promantus.hireprous.entity.ResourceAccomplishment;
-import com.promantus.hireprous.entity.Role;
 import com.promantus.hireprous.entity.User;
 import com.promantus.hireprous.repository.BusinessUnitRepository;
 import com.promantus.hireprous.repository.ResourceAccomplishmentRepository;
@@ -53,44 +52,45 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 		List<ResourceAccomplishment> resourceAccomplishmentList = new ArrayList<ResourceAccomplishment>();
 		resourceAccomplishmentList = resourceAccomplishmentRepository.findByResourceName(
 				resourceAccomplishmentDto.getResourceName(), HireProUsUtil.orderByUpdatedDateTimeDesc());
-		for (ResourceAccomplishment resourceAccomplishment : resourceAccomplishmentList) {
-			// 2022-03-31 - 2023-03-08
-			if (currentDT.getYear() == resourceAccomplishment.getCreatedDateTime().getYear()) {
-				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
-				resultDto.setMessage("Entry already exist for this year");
-			} else {
+
+		if (resourceAccomplishmentList.size() > 0) {
+			for (ResourceAccomplishment resourceAccomplishment : resourceAccomplishmentList) {
+				// 2022-03-31 - 2023-03-08
+				if (currentDT.getYear() == resourceAccomplishment.getCreatedDateTime().getYear()) {
+					resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+					resultDto.setMessage("Entry already exist for this year");
+				} else {
+					addNewEntry(resourceAccomplishmentDto);
+					resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
+					resultDto.setMessage("Entry Added Successfully");
+				}
+
+
+		if (resourceAccomplishmentList.size() > 0) {
+			ResourceAccomplishment resourceAccomplishment1 = resourceAccomplishmentList.get(0);
+			LocalDateTime updatedDT = resourceAccomplishment1.getUpdatedDateTime();
+
+			if (currentDT.getMonthValue() > updatedDT.getMonthValue() && currentDT.getYear() >= updatedDT.getYear()) {
 				addNewEntry(resourceAccomplishmentDto);
 				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
 				resultDto.setMessage("Entry Added Successfully");
+
+			} else {
+				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage("Entry already exist for this month");
+			}
+
+		} else {
+			addNewEntry(resourceAccomplishmentDto);
+			resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
+			resultDto.setMessage("Entry Added Successfully");
 			}
 		}
-
-//		if (resourceAccomplishmentList.size() > 0) {
-//			ResourceAccomplishment resourceAccomplishment = resourceAccomplishmentList.get(0);
-//			LocalDateTime updatedDT = resourceAccomplishment.getUpdatedDateTime();
-//
-//			if (currentDT.getMonthValue() > updatedDT.getMonthValue() && currentDT.getYear() >= updatedDT.getYear()) {
-//				addNewEntry(resourceAccomplishmentDto);
-//				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
-//				resultDto.setMessage("Entry Added Successfully");
-//
-//			} else {
-//				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
-//				resultDto.setMessage("Entry already exist for this month");
-//			}
-//	}
-//
-//		else {
-//			addNewEntry(resourceAccomplishmentDto);
-//			resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
-//			resultDto.setMessage("Entry added");
-//
-//		}
-
+	  }
 		return resultDto;
-
+				
 	}
-
+			
 	@SuppressWarnings("unused")
 	@Override
 	public ResourceAccomplishmentDto updateResourceAccomplishment(ResourceAccomplishmentDto resourceAccomplishmentDto,
@@ -184,49 +184,59 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 
 		List<ResourceAccomplishment> resourceAccomplishmentList = new ArrayList<ResourceAccomplishment>();
 		resourceAccomplishmentList = resourceAccomplishmentRepository.findAll();
+		int index = 0;
 		for (ResourceAccomplishment resourceAccomplishment : resourceAccomplishmentList) {
-			resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment));
+			index++;
+			resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment, index));
+		}
+
+		return resourceAccomplishmentDtoList;
+	}
+	@Override
+	public List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuId(Long buId) throws Exception {
+
+		List<ResourceAccomplishmentDto> resourceAccomplishmentDtoList = new ArrayList<ResourceAccomplishmentDto>();
+
+		List<ResourceAccomplishment> resourceAccomplishmentList = new ArrayList<ResourceAccomplishment>();
+		resourceAccomplishmentList = resourceAccomplishmentRepository.findByBuId(buId);
+		int index = 0;
+		for (ResourceAccomplishment resourceAccomplishment : resourceAccomplishmentList) {
+
+			index++;
+			resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment, index));
+
 		}
 
 		return resourceAccomplishmentDtoList;
 	}
 
 	@Override
-	public List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuId(long buId) throws Exception {
+	public List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuIdYear(Long buId, int year) throws Exception {
 
 		List<ResourceAccomplishmentDto> resourceAccomplishmentDtoList = new ArrayList<ResourceAccomplishmentDto>();
 
 		List<ResourceAccomplishment> resourceAccomplishmentList = new ArrayList<ResourceAccomplishment>();
 		resourceAccomplishmentList = resourceAccomplishmentRepository.findByBuId(buId);
-		for (ResourceAccomplishment resourceAccomplishment : resourceAccomplishmentList) {
-
-			resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment));
-
-		}
-
-		return resourceAccomplishmentDtoList;
-	}
-
-	@Override
-	public List<ResourceAccomplishmentDto> getResourceAccomplishmentByBuIdYear(long buId, int year) throws Exception {
-
-		List<ResourceAccomplishmentDto> resourceAccomplishmentDtoList = new ArrayList<ResourceAccomplishmentDto>();
-
-		List<ResourceAccomplishment> resourceAccomplishmentList = new ArrayList<ResourceAccomplishment>();
-		resourceAccomplishmentList = resourceAccomplishmentRepository.findByBuId(buId);
+		int index = 0;
 		for (ResourceAccomplishment resourceAccomplishment : resourceAccomplishmentList) {
 			if (resourceAccomplishment.getCreatedDateTime().getYear() == year) {
-				resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment));
+				index++;
+				resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment, index));
 			}
+
+			resourceAccomplishmentDtoList.add(this.getResourceAccomplishmentDto(resourceAccomplishment, index));
+
 		}
 
 		return resourceAccomplishmentDtoList;
 	}
 
-	private ResourceAccomplishmentDto getResourceAccomplishmentDto(ResourceAccomplishment resourceAccomplishment) {
+	private ResourceAccomplishmentDto getResourceAccomplishmentDto(ResourceAccomplishment resourceAccomplishment,
+			int index) {
 
 		ResourceAccomplishmentDto resourceAccomplishmentDto = new ResourceAccomplishmentDto();
 
+		resourceAccomplishmentDto.setSerialNo(index);;
 		resourceAccomplishmentDto.setId(resourceAccomplishment.getId());
 		resourceAccomplishmentDto.setResourceName(resourceAccomplishment.getResourceName());
 		resourceAccomplishmentDto.setAchievements(resourceAccomplishment.getAchievements());
@@ -273,7 +283,7 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 		ResourceAccomplishmentDto resourceAccomplishmentDto = new ResourceAccomplishmentDto();
 		ResourceAccomplishment resourceAccomplishment = resourceAccomplishmentRepository.findById(id);
 		if (resourceAccomplishment != null) {
-			resourceAccomplishmentDto = getResourceAccomplishmentDto(resourceAccomplishment);
+			resourceAccomplishmentDto = getResourceAccomplishmentDto(resourceAccomplishment, 0);
 		} else {
 			resourceAccomplishmentDto.setMessage("Entry not Found");
 		}
@@ -292,9 +302,13 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 		List<ResourceAccomplishment> resourceAccomplishment = new ArrayList<ResourceAccomplishment>();
 		resourceAccomplishment = resourceAccomplishmentRepository.findByResourceName(name);
 		if (resourceAccomplishment != null) {
+			int index = 0;
+
 			// System.out.println(resourceAccomplishment.getResourceName());
-			for (ResourceAccomplishment resource : resourceAccomplishment)
-				resourceAccomplishmentDto.add(getResourceAccomplishmentDto(resource));
+			for (ResourceAccomplishment resource : resourceAccomplishment) {
+				index++;
+				resourceAccomplishmentDto.add(getResourceAccomplishmentDto(resource, index));
+			}
 		} else {
 			// resourceAccomplishmentDto.setMessage("Entry not Found");
 		}
@@ -306,9 +320,8 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 		List<ResourceAccomplishment> getResByname = new ArrayList<ResourceAccomplishment>();
 		getResByname = resourceAccomplishmentRepository.findByResourceName(name);
 		ResourceAccomplishmentDto resultDto = new ResourceAccomplishmentDto();
-
-		for (ResourceAccomplishment resourceAccomplishment : getResByname) {
-			if (resourceAccomplishment.getCreatedDateTime().getYear() == Integer.parseInt(year)) {
+		if (getResByname != null) {
+			if (getResByname.get(0).getCreatedDateTime().getYear() == Integer.parseInt(year)) {
 				resultDto.setMessage("Already Record Exsits for this year: " + year);
 				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
 			} else {
@@ -316,18 +329,10 @@ public class ResourceAccomplishmentImpl implements ResourceAccomplishmentService
 				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
 			}
 		}
-
-//		if (getResByname != null) {
-//			if (getResByname.get(0).getCreatedDateTime().getYear() == Integer.parseInt(year)) {
-//				resultDto.setMessage("Already Record Exsits for this year: " + year);
-//				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_ERROR);
-//			} else {
-//				resultDto.setMessage("Record Doesn't Exsits for this year: " + year);
-//				resultDto.setResultStatus(HireProUsConstants.RETURN_STATUS_OK);
-//			}
-//		}
 		return resultDto;
 
 	}
+
+	
 
 }

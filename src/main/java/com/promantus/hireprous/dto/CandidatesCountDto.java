@@ -28,6 +28,7 @@ public class CandidatesCountDto implements Serializable {
 	private Long selected;
 	private Long onboarded;
 	private Long dropped;
+	private Long offerRejected;
 
 	/**
 	 * @return the totalTagged
@@ -153,5 +154,13 @@ public class CandidatesCountDto implements Serializable {
 	 */
 	public void setDropped(Long dropped) {
 		this.dropped = dropped;
+	}
+
+	public Long getOfferRejected() {
+		return offerRejected;
+	}
+
+	public void setOfferRejected(Long offerRejected) {
+		this.offerRejected = offerRejected;
 	}
 }

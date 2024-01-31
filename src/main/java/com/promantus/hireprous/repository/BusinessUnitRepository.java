@@ -60,6 +60,4 @@ public interface BusinessUnitRepository extends MongoRepository<BusinessUnit, St
 //	Object getBusinessUnitByBusinessUnitNameIgnoreCase(String buName);
 
 	Object getBusinessUnitByBusinessUnitNameAndManagerIdIgnoreCase(String buName, long managerId);
-
-	Object getBusinessUnitByBusinessUnitNameAndManagerId(String buName, long managerId);
 }

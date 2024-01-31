@@ -34,7 +34,7 @@ public class ResourceAccomplishmentDto implements Serializable {
 	private String message;
 	private Long roleId;
 	private String roleName;
-	
+	private int serialNo;
 
 	public String getRoleName() {
 		return roleName;
@@ -236,4 +236,12 @@ public class ResourceAccomplishmentDto implements Serializable {
 		this.refId = refId;
 	}
 
+	public int getSerialNo() {
+		return serialNo;
+	}
+
+	public void setSerialNo(int serialNo) {
+		this.serialNo = serialNo;
+	}
+	
 }

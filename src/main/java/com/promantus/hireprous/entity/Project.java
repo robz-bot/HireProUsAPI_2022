@@ -27,7 +27,6 @@ public class Project {
 	private LocalDateTime createdDateTime;
 	private long updatedBy;
 	private LocalDateTime updatedDateTime;
-	private String projStatus;
 
 	/**
 	 * @return the id
@@ -139,13 +138,5 @@ public class Project {
 	 */
 	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
-	}
-
-	public String getProjStatus() {
-		return projStatus;
-	}
-
-	public void setProjStatus(String projStatus) {
-		this.projStatus = projStatus;
 	}
 }

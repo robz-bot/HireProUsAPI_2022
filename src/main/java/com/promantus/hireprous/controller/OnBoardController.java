@@ -52,6 +52,7 @@ public class OnBoardController extends CommonController {
 		OnboardDto resultDto = new OnboardDto();
 		try {
 
+			
 			// Mandatory check.
 			StringBuilder errorParam = new StringBuilder();
 			// Job Request Number.
@@ -62,17 +63,19 @@ public class OnBoardController extends CommonController {
 			if (onboardDto.getCandidateId() == null || onboardDto.getCandidateId() == 0) {
 				errorParam.append(errorParam.length() > 0 ? ", Candidate Id" : "Candidate Id");
 			}
-			// Date of joining.
-			if (onboardDto.getJoiningDate() == null) {
-				errorParam.append(errorParam.length() > 0 ? ", Date of joining" : "Date of joining");
-			}
-			// Email.
-			if (onboardDto.getEmail() == null || onboardDto.getEmail().isEmpty()) {
-				errorParam.append(errorParam.length() > 0 ? ", Email" : "Email");
-			}
-			// EmployeeIdByHR.
-			if (onboardDto.getEmployeeIdByHR() == null || onboardDto.getEmployeeIdByHR().isEmpty()) {
-				errorParam.append(errorParam.length() > 0 ? ", EmployeeId ByHR" : "EmployeeId ByHR");
+			if (onboardDto.getOfferAccepted() == "1") {
+				// Date of joining.
+				if (onboardDto.getJoiningDate() == null) {
+					errorParam.append(errorParam.length() > 0 ? ", Date of joining" : "Date of joining");
+				}
+				// Email.
+				if (onboardDto.getEmail() == null || onboardDto.getEmail().isEmpty()) {
+					errorParam.append(errorParam.length() > 0 ? ", Email" : "Email");
+				}
+				// EmployeeIdByHR.
+				if (onboardDto.getEmployeeIdByHR() == null || onboardDto.getEmployeeIdByHR().isEmpty()) {
+					errorParam.append(errorParam.length() > 0 ? ", EmployeeId ByHR" : "EmployeeId ByHR");
+				}
 			}
 
 			if (errorParam.length() > 0) {

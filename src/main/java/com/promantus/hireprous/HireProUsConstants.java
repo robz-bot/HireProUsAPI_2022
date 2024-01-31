@@ -277,6 +277,9 @@ public final class HireProUsConstants {
 
 	/** REC_STATUS_DROPPED - '26'. */
 	public static final String REC_STATUS_DROPPED = "26";
+	
+	/** REC_STATUS_OFFER_DECLINED - '27'. */
+	public static final String REC_STATUS_OFFER_DECLINED = "27";
 
 	// Mail Purpose
 	// --------------------------------------------------------------------------
@@ -363,4 +366,27 @@ public final class HireProUsConstants {
 	/** SCHEDULE_DURATION_2_HOURS - '2 hours'. */
 	public static final String SCHEDULE_DURATION_2_HOURS = "2 hours";
 
+	//Timesheet Status
+	
+	//APPROVED
+	public static final String APPROVED = "Approved";
+	
+	//PENDING
+	public static final String PENDING = "Pending";
+	
+	//REJECT
+	public static final String REJECT = "Rejected";
+	
+	
+	//TODAY
+		public static final String TODAY = "Today";
+		
+		//THISWEEK
+		public static final String THISWEEK = "This Week";
+		
+		//LASTWEEK
+		public static final String LASTWEEK = "Last Week";
+		
+		//YESTERDAY
+		public static final String YESTERDAY = "Yesterday";
 }

@@ -159,122 +159,149 @@ public class OnboardServiceImpl implements OnboardService {
 			logger.info(resultDto.getMessage());
 			return resultDto;
 		}
-		this.checkCandidate(onboardDto.getCandidateId(), onboardDto.getEmail(), onboardDto.getContactNumber());
+		
 
 		Onboard onboard = new Onboard();
-		onboard.setId(commonService.nextSequenceNumber());
+		// CandidateDto candidateDto = new CandidateDto();
+		if (Integer.parseInt(onboardDto.getOfferAccepted()) == 1) {
+			this.checkCandidate(onboardDto.getCandidateId(), onboardDto.getEmail(), onboardDto.getContactNumber());
+			onboard.setId(commonService.nextSequenceNumber());
 
-		onboard.setJrNumber(onboardDto.getJrNumber());
-		onboard.setCandidateId(onboardDto.getCandidateId());
+			onboard.setOfferAccepted(Integer.parseInt(onboardDto.getOfferAccepted()) == 1 ? true : false);
+			onboard.setJrNumber(onboardDto.getJrNumber());
+			onboard.setCandidateId(onboardDto.getCandidateId());
 
-		this.setEmployeeId(onboard);
-		onboardDto.setEmployeeId(onboard.getEmployeeId());
+			this.setEmployeeId(onboard);
+			onboardDto.setEmployeeId(onboard.getEmployeeId());
 
-		onboard.setEmployeeIdByHR(onboardDto.getEmployeeIdByHR());
-		onboard.setWorkOrderNumber(onboardDto.getWorkOrderNumber());
-		onboard.setJoiningDate(onboardDto.getJoiningDate());
+			onboard.setEmployeeIdByHR(onboardDto.getEmployeeIdByHR());
+			onboard.setWorkOrderNumber(onboardDto.getWorkOrderNumber());
+			onboard.setJoiningDate(onboardDto.getJoiningDate());
 
-		if (onboardDto.getProjectId() != null && !onboardDto.getProjectId().equals(0L)) {
-			onboard.setProjectId(onboardDto.getProjectId());
-		}
-		if (onboardDto.getResourceId() != null && !onboardDto.getResourceId().equals(0L)) {
-			onboard.setResourceId(onboardDto.getResourceId());
-		}
-
-		onboard.setDocsVerified(onboardDto.getDocsVerified());
-		onboard.setJoined(onboardDto.getJoined());
-		onboard.setEmail(onboardDto.getEmail());
-
-		onboard.setRecStatus(HireProUsConstants.REC_STATUS_ONBOARDED);
-
-		onboard.setCreatedBy(onboardDto.getCreatedBy());
-		onboard.setUpdatedBy(onboardDto.getUpdatedBy());
-		onboard.setCreatedDateTime(LocalDateTime.now());
-		onboard.setUpdatedDateTime(LocalDateTime.now());
-
-//		onboardRepository.save(onboard);
-//
-//		candidateService.updateRecStatus(onboardDto.getCandidateId(), HireProUsConstants.REC_STATUS_ONBOARDED,
-//				onboardDto.getUpdatedBy());
-
-		// get Candidate details.
-		CandidateDto candidateDto = candidateService.getCandidateById(onboardDto.getCandidateId() + "");
-
-		// Update in Resource management.
-//		if (candidateDto.getCandidateType().equals(HireProUsConstants.CANDIDATE_TYPE_EXTERNAL)) {
-		if (onboardDto.getResourceId() == null || onboardDto.getResourceId().equals(0L)) {
-
-			ResourceMgmtDto resourceMgmtDto = new ResourceMgmtDto();
-			resourceMgmtDto.setEmployeeId(onboardDto.getEmployeeId());
-			resourceMgmtDto.setEmployeeIdByHR(onboardDto.getEmployeeIdByHR());
-			resourceMgmtDto.setWorkOrderNumber(onboardDto.getWorkOrderNumber());
-
-			resourceMgmtDto.setFirstName(candidateDto.getFirstName());
-			resourceMgmtDto.setLastName(candidateDto.getLastName());
-			resourceMgmtDto.setEmail(onboardDto.getEmail());
-			resourceMgmtDto.setContactNumber(candidateDto.getContactNumber());
-			resourceMgmtDto.setSex(candidateDto.getSex());
-			resourceMgmtDto.setSkillSet(candidateDto.getSkillSet());
-			resourceMgmtDto.setExperience(candidateDto.getExperience());
-
-			resourceMgmtDto.setEmploymentType(candidateDto.getEmploymentType());
-			resourceMgmtDto.setBuId(onboardDto.getBuId());
-
-			resourceMgmtDto.setProjectAllocation("No");
 			if (onboardDto.getProjectId() != null && !onboardDto.getProjectId().equals(0L)) {
-				resourceMgmtDto.setProjectAllocation("Yes");
-				resourceMgmtDto.setProjectId(onboardDto.getProjectId());
-				resourceMgmtDto.setCustomerId(projectService.getCustomerIdById(onboardDto.getProjectId()));
+				onboard.setProjectId(onboardDto.getProjectId());
+			}
+			if (onboardDto.getResourceId() != null && !onboardDto.getResourceId().equals(0L)) {
+				onboard.setResourceId(onboardDto.getResourceId());
 			}
 
-			resourceMgmtDto.setCreatedBy(onboardDto.getCreatedBy());
-			resourceMgmtDto.setUpdatedBy(onboardDto.getUpdatedBy());
+			onboard.setDocsVerified(onboardDto.getDocsVerified());
+			onboard.setJoined(onboardDto.getJoined());
+			onboard.setEmail(onboardDto.getEmail());
 
-			ResourceMgmtDto resourceMgmtDtoResult = resourceMgmtService.addResourceMgmt(resourceMgmtDto, lang);
-			if (resourceMgmtDtoResult.getStatus() == 1) {
-				throw new Exception(resourceMgmtDtoResult.getMessage());
-//				return resultDto;
-			}
+			onboard.setRecStatus(HireProUsConstants.REC_STATUS_ONBOARDED);
 
-			onboard.setResourceId(resourceMgmtDtoResult.getId());
+			onboard.setCreatedBy(onboardDto.getCreatedBy());
+			onboard.setUpdatedBy(onboardDto.getUpdatedBy());
+			onboard.setCreatedDateTime(LocalDateTime.now());
+			onboard.setUpdatedDateTime(LocalDateTime.now());
 
-//			onboardRepository.save(onboard);
+			// onboardRepository.save(onboard);
+			//
+			// candidateService.updateRecStatus(onboardDto.getCandidateId(),
+			// HireProUsConstants.REC_STATUS_ONBOARDED,
+			// onboardDto.getUpdatedBy());
 
-		} else {
+			// get Candidate details.
+			CandidateDto candidateDto = candidateService.getCandidateById(onboardDto.getCandidateId() + "");
 
-			try {
-				ResourceMgmtDto resourceMgmtDtoResult = resourceMgmtService.updateProjectAllocationById(
-						onboardDto.getResourceId() + "", onboardDto.getProjectId(),
-						projectService.getCustomerIdById(onboardDto.getProjectId()), onboardDto.getUpdatedBy(),
-						onboardDto.getWorkOrderNumber(), onboardDto.getEmployeeIdByHR(), onboardDto.getEmail(),
-						onboardDto.getBuId());
+			// Update in Resource management.
+			// if
+			// (candidateDto.getCandidateType().equals(HireProUsConstants.CANDIDATE_TYPE_EXTERNAL))
+			// {
+			if (onboardDto.getResourceId() == null || onboardDto.getResourceId().equals(0L)) {
+
+				ResourceMgmtDto resourceMgmtDto = new ResourceMgmtDto();
+				resourceMgmtDto.setEmployeeId(onboardDto.getEmployeeId());
+				resourceMgmtDto.setEmployeeIdByHR(onboardDto.getEmployeeIdByHR());
+				resourceMgmtDto.setWorkOrderNumber(onboardDto.getWorkOrderNumber());
+
+				resourceMgmtDto.setFirstName(candidateDto.getFirstName());
+				resourceMgmtDto.setLastName(candidateDto.getLastName());
+				resourceMgmtDto.setEmail(onboardDto.getEmail());
+				resourceMgmtDto.setContactNumber(candidateDto.getContactNumber());
+				resourceMgmtDto.setSex(candidateDto.getSex());
+				resourceMgmtDto.setSkillSet(candidateDto.getSkillSet());
+				resourceMgmtDto.setExperience(candidateDto.getExperience());
+
+				resourceMgmtDto.setEmploymentType(candidateDto.getEmploymentType());
+				resourceMgmtDto.setBuId(onboardDto.getBuId());
+
+				resourceMgmtDto.setProjectAllocation("No");
+				if (onboardDto.getProjectId() != null && !onboardDto.getProjectId().equals(0L)) {
+					resourceMgmtDto.setProjectAllocation("Yes");
+					resourceMgmtDto.setProjectId(onboardDto.getProjectId());
+					resourceMgmtDto.setCustomerId(projectService.getCustomerIdById(onboardDto.getProjectId()));
+				}
+
+				resourceMgmtDto.setCreatedBy(onboardDto.getCreatedBy());
+				resourceMgmtDto.setUpdatedBy(onboardDto.getUpdatedBy());
+
+				ResourceMgmtDto resourceMgmtDtoResult = resourceMgmtService.addResourceMgmt(resourceMgmtDto, lang);
 				if (resourceMgmtDtoResult.getStatus() == 1) {
 					throw new Exception(resourceMgmtDtoResult.getMessage());
-//					return resultDto;
+					// return resultDto;
 				}
-			} catch (Exception e) {
-				throw new Exception(e.getMessage());
-			}
-		}
 
-		candidateService.updateRecStatus(onboardDto.getCandidateId(), HireProUsConstants.REC_STATUS_ONBOARDED,
-				onboardDto.getUpdatedBy());
+				onboard.setResourceId(resourceMgmtDtoResult.getId());
 
-		onboardRepository.save(onboard);
+				// onboardRepository.save(onboard);
 
-		// Send OnBoarded Mail.
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
+			} else {
+
 				try {
-					mailService.sendOnBoardedEmail(candidateDto, onboardDto);
+					ResourceMgmtDto resourceMgmtDtoResult = resourceMgmtService.updateProjectAllocationById(
+							onboardDto.getResourceId() + "", onboardDto.getProjectId(),
+							projectService.getCustomerIdById(onboardDto.getProjectId()), onboardDto.getUpdatedBy(),
+							onboardDto.getWorkOrderNumber(), onboardDto.getEmployeeIdByHR(), onboardDto.getEmail(),
+							onboardDto.getBuId());
+					if (resourceMgmtDtoResult.getStatus() == 1) {
+						throw new Exception(resourceMgmtDtoResult.getMessage());
+						// return resultDto;
+					}
 				} catch (Exception e) {
-
-					logger.error("Email for Onboard is not Sent.");
-					logger.error(HireProUsUtil.getErrorMessage(e));
+					throw new Exception(e.getMessage());
 				}
 			}
-		}).start();
+
+			candidateService.updateRecStatus(onboardDto.getCandidateId(), HireProUsConstants.REC_STATUS_ONBOARDED,
+					onboardDto.getUpdatedBy());
+			// Send OnBoarded Mail.
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						if (Integer.parseInt(onboardDto.getOfferAccepted()) == 1) {
+							mailService.sendOnBoardedEmail(candidateDto, onboardDto);
+						}
+					} catch (Exception e) {
+
+						logger.error("Email for Onboard is not Sent.");
+						logger.error(HireProUsUtil.getErrorMessage(e));
+					}
+				}
+			}).start();
+		} else {
+			onboard.setId(commonService.nextSequenceNumber());
+
+			onboard.setOfferAccepted(Integer.parseInt(onboardDto.getOfferAccepted()) == 1 ? true : false);
+			onboard.setJrNumber(onboardDto.getJrNumber());
+			onboard.setCandidateId(onboardDto.getCandidateId());
+
+			this.setEmployeeId(onboard);
+			onboardDto.setEmployeeId(onboard.getEmployeeId());
+
+			onboard.setRecStatus(HireProUsConstants.REC_STATUS_OFFER_DECLINED);
+
+			onboard.setCreatedBy(onboardDto.getCreatedBy());
+			onboard.setUpdatedBy(onboardDto.getUpdatedBy());
+			onboard.setCreatedDateTime(LocalDateTime.now());
+			onboard.setUpdatedDateTime(LocalDateTime.now());
+
+			candidateService.updateRecStatus(onboardDto.getCandidateId(), HireProUsConstants.REC_STATUS_OFFER_DECLINED,
+					onboardDto.getUpdatedBy());
+		}
+		onboardRepository.save(onboard);
 
 		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
 		return resultDto;
@@ -543,6 +570,7 @@ public class OnboardServiceImpl implements OnboardService {
 			onboardDto.setSex(candidateDto.getSex());
 			onboardDto.setExperience(candidateDto.getExperience());
 		}
+		onboardDto.setOfferAccepted(String.valueOf(onboard.isOfferAccepted()));
 		return onboardDto;
 	}
 
