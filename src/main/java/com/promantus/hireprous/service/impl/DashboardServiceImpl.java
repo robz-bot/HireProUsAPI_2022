@@ -21,18 +21,26 @@ import org.springframework.stereotype.Service;
 
 import com.promantus.hireprous.HireProUsConstants;
 import com.promantus.hireprous.dto.BUsCountDto;
+import com.promantus.hireprous.dto.CandidateDto;
+import com.promantus.hireprous.dto.CandidateStatusDto;
+import com.promantus.hireprous.dto.CandidatesCountDto;
+import com.promantus.hireprous.dto.InterviewScheduleDto;
+import com.promantus.hireprous.dto.InterviewScheduleSearchDto;
 import com.promantus.hireprous.dto.JobRequestAgingCountDto;
 import com.promantus.hireprous.dto.JobRequestDto;
 import com.promantus.hireprous.dto.JobRequestStagesCountDto;
+import com.promantus.hireprous.dto.OnboardDto;
 import com.promantus.hireprous.dto.WidgetDto;
 import com.promantus.hireprous.entity.BusinessUnit;
 import com.promantus.hireprous.entity.Candidate;
 import com.promantus.hireprous.entity.InterviewSchedule;
 import com.promantus.hireprous.entity.JobRequest;
+import com.promantus.hireprous.entity.Onboard;
 import com.promantus.hireprous.repository.BusinessUnitRepository;
 import com.promantus.hireprous.repository.CandidateRepository;
 import com.promantus.hireprous.repository.InterviewScheduleRepository;
 import com.promantus.hireprous.repository.JobRequestRepository;
+import com.promantus.hireprous.repository.OnboardRepository;
 import com.promantus.hireprous.service.DashboardService;
 import com.promantus.hireprous.service.InterviewScheduleService;
 import com.promantus.hireprous.service.JobRequestService;
@@ -44,6 +52,7 @@ import com.promantus.hireprous.util.HireProUsUtil;
  */
 @Service
 public class DashboardServiceImpl implements DashboardService {
+
 
 //	private static final Logger logger = LoggerFactory.getLogger(DashboardServiceImpl.class);
 
@@ -67,6 +76,9 @@ public class DashboardServiceImpl implements DashboardService {
 
 	@Autowired
 	InterviewScheduleRepository interviewScheduleRepository;
+
+	@Autowired
+	OnboardRepository onboardRepository;
 
 	@Override
 	public List<WidgetDto> getWidgetData(String userId, String lang) throws Exception {
@@ -596,9 +608,9 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public Map<String, Integer> getRecMenuCounts() {
+	public Map<String, Object> getRecMenuCounts(String userId) {
 		List<InterviewSchedule> interviewSchedulesListForIR1 = new ArrayList<InterviewSchedule>();
-		
+
 //
 //			interviewSchedulesListForIR1 = interviewScheduleRepository
 //					.findByRecStatusAndCompleted(HireProUsConstants.REC_STATUS_SHORTLISTED_0, 0);
@@ -622,10 +634,158 @@ public class DashboardServiceImpl implements DashboardService {
 //
 //			interviewSchedulesList = interviewScheduleRepository.findByRecStatusAndCompleted(
 //					HireProUsConstants.REC_STATUS_PASSED_HR4, 0, HireProUsUtil.orderByUpdatedDateTimeDesc());
-		
-		Map<String, Integer> result = new HashMap<String, Integer>();
+
+//		this.getAllJobRequestCounts();
+
+		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("BUCount", interviewScheduleRepository
 				.findByRecStatusAndCompleted(HireProUsConstants.REC_STATUS_PASSED_HR4, 0).size());
+		result.put("JobReq", this.getAllJobRequestCounts());
+		result.put("CandidatesCount", this.getAllCandidatesCounts());
+		result.put("ResumeShortlistedCount", this.getResumeShortlistCount());
+		result.put("ScheduleInterviewCount", this.getScheduleInterviewCount());
+		result.put("OnboardCandidateCount", this.getOnboardCandidateCount());
+		result.put("YettoOnboardCount", this.getYettoOnboardCount());
 		return result;
 	}
+
+	private Map<String, Object> getAllJobRequestCounts() {
+		Map<String, Object> result = new HashMap<String, Object>();
+
+		result.put("open",
+				jobRequestRepository.countByJobReqStatus(HireProUsConstants.JOB_REQUEST_STATUS_YET_TO_START));
+		result.put("inprogress",
+				jobRequestRepository.countByJobReqStatus(HireProUsConstants.JOB_REQUEST_STATUS_IN_PROGRESS));
+		result.put("hold", jobRequestRepository.countByJobReqStatus(HireProUsConstants.JOB_REQUEST_STATUS_HOLD));
+		result.put("terminated",
+				jobRequestRepository.countByJobReqStatus(HireProUsConstants.JOB_REQUEST_STATUS_TERMINATED));
+		result.put("closed", jobRequestRepository.countByJobReqStatus(HireProUsConstants.JOB_REQUEST_STATUS_CLOSED));
+		return result;
+
+	}
+
+
+	private int getResumeShortlistCount() {
+		List<Candidate> candidatesList = candidateRepository.findByRecStatus("00",
+				HireProUsUtil.orderByUpdatedDateTimeDesc());
+
+		return candidatesList.size();
+	}
+
+	private Map<String, Integer> getScheduleInterviewCount() {
+
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		result.put("IR1",
+				interviewScheduleRepository.findByRecStatusAndCompleted(HireProUsConstants.REC_STATUS_SHORTLISTED_0, 0,
+						HireProUsUtil.orderByUpdatedDateTimeDesc()).size());
+		result.put("IR2",
+				interviewScheduleRepository.findByRecStatusAndCompleted(HireProUsConstants.REC_STATUS_PASSED_R1, 0,
+						HireProUsUtil.orderByUpdatedDateTimeDesc()).size());
+		result.put("CustomerRound",
+				interviewScheduleRepository.findByRecStatusAndCompleted(HireProUsConstants.REC_STATUS_PASSED_R2, 0,
+						HireProUsUtil.orderByUpdatedDateTimeDesc()).size());
+		result.put("HR",
+				interviewScheduleRepository.findByRecStatusAndCompleted(HireProUsConstants.REC_STATUS_PASSED_CR3, 0,
+						HireProUsUtil.orderByUpdatedDateTimeDesc()).size());
+
+		return result;
+
+	}
+	
+	private int getOnboardCandidateCount(){
+	
+		List<Onboard> onboardsList = onboardRepository.findAll();
+		return onboardsList.size();
+	}
+	
+	private int getYettoOnboardCount() {
+		List<Candidate> candidatesList = candidateRepository.findByRecStatus(HireProUsConstants.REC_STATUS_APPROVED_BU,
+				HireProUsUtil.orderByUpdatedDateTimeDesc());
+		
+		return candidatesList.size();
+	}
+	
+
+
+
+
+	private Map<String, Object> getAllCandidatesCounts() {
+		Map<String, Object> result = new HashMap<String, Object>();
+
+//		CandidatesCountDto resultDto = new CandidatesCountDto();
+
+		List<Candidate> candidatesList = new ArrayList<Candidate>();
+
+//		if (vendorId == null || vendorId.isEmpty()) {
+		candidatesList = candidateRepository.findAll();
+//		} else {
+//			candidatesList = candidateRepository.findByVendorId(Long.parseLong(vendorId));
+//		}
+
+//		resultDto.setTotalTagged((long) candidatesList.size());
+
+		long uploaded = 0;
+		long shortlisted = 0;
+		long holded = 0;
+		long rejected = 0;
+		long selected = 0;
+		long onboarded = 0;
+		long dropped = 0;
+		long offerRejected = 0;
+		for (Candidate candidate : candidatesList) {
+
+			String recStatus = candidate.getRecStatus();
+			if (recStatus.equals(HireProUsConstants.REC_STATUS_UPLOADED)) {
+				uploaded += 1;
+			}
+			if (recStatus.equals(HireProUsConstants.REC_STATUS_SHORTLISTED_0)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_PASSED_R1)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_PASSED_R2)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_PASSED_CR3)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_PASSED_HR4)) {
+				shortlisted += 1;
+			}
+			if (recStatus.equals(HireProUsConstants.REC_STATUS_HOLDED_0)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_HOLDED_R1)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_HOLDED_R2)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_HOLDED_CR3)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_HOLDED_HR4)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_HOLDED_BU)) {
+				holded += 1;
+			}
+			if (recStatus.equals(HireProUsConstants.REC_STATUS_REJECTED_0)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_REJECTED_R1)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_REJECTED_R2)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_REJECTED_CR3)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_REJECTED_HR4)
+					|| recStatus.equals(HireProUsConstants.REC_STATUS_REJECTED_BU)) {
+				rejected += 1;
+			}
+			if (recStatus.equals(HireProUsConstants.REC_STATUS_SELECTED)) {
+				selected += 1;
+			}
+			if (recStatus.equals(HireProUsConstants.REC_STATUS_ONBOARDED)) {
+				onboarded += 1;
+			}
+			if (recStatus.equals(HireProUsConstants.REC_STATUS_DROPPED)) {
+				dropped += 1;
+			}
+			if (recStatus.equals(HireProUsConstants.REC_STATUS_OFFER_DECLINED)) {
+				offerRejected += 1;
+			}
+		}
+
+		result.put("uploaded", uploaded);
+		result.put("shortlisted", shortlisted);
+		result.put("hold", holded);
+		result.put("rejected", rejected);
+		result.put("selected", selected);
+		result.put("onboarded", onboarded);
+		result.put("dropped", dropped);
+		result.put("offerRejected", offerRejected);
+		;
+
+		return result;
+	}
+
 }

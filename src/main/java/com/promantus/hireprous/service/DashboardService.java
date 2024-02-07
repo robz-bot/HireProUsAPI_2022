@@ -104,6 +104,6 @@ public interface DashboardService {
 	 */
 	List<JobRequestDto> getLatestJobRequestsForVendor(String vendorId, String lang) throws Exception;
 
-	Map<String, Integer> getRecMenuCounts();
+	Map<String, Object> getRecMenuCounts(String userId);
 
 }

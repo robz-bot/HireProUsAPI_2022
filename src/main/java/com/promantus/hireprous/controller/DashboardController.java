@@ -12,6 +12,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -37,6 +38,7 @@ import com.promantus.hireprous.util.HireProUsUtil;
  */
 @RestController
 @RequestMapping("/api/v1")
+@CrossOrigin("*")
 public class DashboardController extends CommonController {
 
 	private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
@@ -54,10 +56,10 @@ public class DashboardController extends CommonController {
 
 		try {
 			if (vendorId == null || vendorId.isEmpty()) {
-			
+
 				return dashboardService.getWidgetData(userId, lang);
 			} else {
-				
+
 				return dashboardService.getWidgetDataForVendor(vendorId, lang);
 			}
 		} catch (final Exception e) {
@@ -205,13 +207,10 @@ public class DashboardController extends CommonController {
 
 		return new ArrayList<CandidateStatusDto>();
 	}
-	
-	@GetMapping("/getRecMenuCounts")
-	public Map<String,Integer> getAllCandidateStagesByBU(){
-		
-		
-		
-		
-		return dashboardService.getRecMenuCounts();
+
+	@GetMapping("/getRecMenuCounts/{userId}")
+	public Map<String, Object> getAllCandidateStagesByBU(@PathVariable String userId) {
+
+		return dashboardService.getRecMenuCounts(userId);
 	}
 }
