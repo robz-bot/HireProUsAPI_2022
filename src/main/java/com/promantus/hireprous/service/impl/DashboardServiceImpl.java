@@ -46,6 +46,8 @@ import com.promantus.hireprous.service.InterviewScheduleService;
 import com.promantus.hireprous.service.JobRequestService;
 import com.promantus.hireprous.util.HireProUsUtil;
 
+import io.netty.handler.codec.http.HttpContentEncoder.Result;
+
 /**
  * @author Sihab.
  *
@@ -644,8 +646,8 @@ public class DashboardServiceImpl implements DashboardService {
 		result.put("CandidatesCount", this.getAllCandidatesCounts());
 		result.put("ResumeShortlistedCount", this.getResumeShortlistCount());
 		result.put("ScheduleInterviewCount", this.getScheduleInterviewCount());
-		result.put("OnboardCandidateCount", this.getOnboardCandidateCount());
-		result.put("YettoOnboardCount", this.getYettoOnboardCount());
+		result.put("CandidatesOnboardCount", this.getCandiatesOnboardCount());
+		result.put("InterviewProcessCandiatesCount", this.getInterviewProcessCandiatesCounts());
 		return result;
 	}
 
@@ -691,21 +693,55 @@ public class DashboardServiceImpl implements DashboardService {
 		return result;
 
 	}
-	
-	private int getOnboardCandidateCount(){
-	
-		List<Onboard> onboardsList = onboardRepository.findAll();
-		return onboardsList.size();
-	}
-	
-	private int getYettoOnboardCount() {
-		List<Candidate> candidatesList = candidateRepository.findByRecStatus(HireProUsConstants.REC_STATUS_APPROVED_BU,
-				HireProUsUtil.orderByUpdatedDateTimeDesc());
-		
-		return candidatesList.size();
-	}
-	
+//in progress	
+	private Map<String, Integer> getInterviewProcessCandiatesCounts(){
 
+		Map<String, Integer> result = new HashMap<String, Integer>();
+
+
+//		List<InterviewSchedule> interviewProcessList = new ArrayList<InterviewSchedule>();
+//		
+//		interviewProcessList = interviewScheduleRepository.findByRecStatus(
+//				HireProUsConstants.REC_STATUS_SCHEDULED_R1, HireProUsUtil.orderByUpdatedDateTimeDesc());
+//		
+//		interviewProcessList = interviewScheduleRepository.findByRecStatus(
+//				HireProUsConstants.REC_STATUS_SCHEDULED_R2, HireProUsUtil.orderByUpdatedDateTimeDesc());
+//		
+//		interviewProcessList = interviewScheduleRepository.findByRecStatus(
+//				HireProUsConstants.REC_STATUS_SCHEDULED_CR3, HireProUsUtil.orderByUpdatedDateTimeDesc());
+//		
+//		interviewProcessList = interviewScheduleRepository.findByRecStatus(
+//				HireProUsConstants.REC_STATUS_SCHEDULED_HR4, HireProUsUtil.orderByUpdatedDateTimeDesc());
+//		
+//		interviewProcessList = interviewScheduleRepository.findByRecStatus(
+//				HireProUsConstants.REC_STATUS_SCHEDULED_BU, HireProUsUtil.orderByUpdatedDateTimeDesc());
+
+		result.put("interviewProcessListIR1", interviewScheduleRepository.findByRecStatus(
+				HireProUsConstants.REC_STATUS_SCHEDULED_R1, HireProUsUtil.orderByUpdatedDateTimeDesc()).size());
+		result.put("interviewProcessListIR2", interviewScheduleRepository.findByRecStatus(
+				HireProUsConstants.REC_STATUS_SCHEDULED_R2, HireProUsUtil.orderByUpdatedDateTimeDesc()).size());
+		result.put("interviewProcessListCR3", interviewScheduleRepository.findByRecStatus(
+				HireProUsConstants.REC_STATUS_SCHEDULED_CR3, HireProUsUtil.orderByUpdatedDateTimeDesc()).size());
+		result.put("interviewProcessListHR4", interviewScheduleRepository.findByRecStatus(
+				HireProUsConstants.REC_STATUS_SCHEDULED_HR4, HireProUsUtil.orderByUpdatedDateTimeDesc()).size());
+
+
+	
+		return result;
+	}
+
+	
+	private Map<String, Integer> getCandiatesOnboardCount() {
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		List<Candidate> candidatesList = candidateRepository.findByRecStatus(HireProUsConstants.REC_STATUS_SELECTED,
+				HireProUsUtil.orderByUpdatedDateTimeDesc());
+		List<Onboard> onboardsList = onboardRepository.findAll(HireProUsUtil.orderByUpdatedDateTimeDesc());
+		
+		result.put("AlreadyOnboardedCount",candidatesList.size());
+		result.put("YettoOnboardCount",onboardsList.size());
+		return result;
+	}
+	
 
 
 
@@ -787,5 +823,6 @@ public class DashboardServiceImpl implements DashboardService {
 
 		return result;
 	}
+	
 
 }

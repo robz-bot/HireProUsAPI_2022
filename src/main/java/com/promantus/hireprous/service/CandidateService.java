@@ -230,6 +230,8 @@ public interface CandidateService {
 
 	CandidateDto updateAIRecStatusLst(List<CandidateDto> candidateDto, String lang) throws Exception;
 
+	CandidateDto resumeHoldingCandidate(CandidateDto candidateDto, String lang) throws Exception;
+
 	
 
 }

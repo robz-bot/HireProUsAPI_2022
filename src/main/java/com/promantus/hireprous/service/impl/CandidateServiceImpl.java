@@ -603,7 +603,8 @@ public class CandidateServiceImpl implements CandidateService {
 		resultDto.setSelected(selected);
 		resultDto.setOnboarded(onboarded);
 		resultDto.setDropped(dropped);
-		resultDto.setOfferRejected(offerRejected);;
+		resultDto.setOfferRejected(offerRejected);
+		;
 
 		return resultDto;
 	}
@@ -2487,4 +2488,42 @@ public class CandidateServiceImpl implements CandidateService {
 		return resultDto;
 	}
 
+	@Override
+	public CandidateDto resumeHoldingCandidate(CandidateDto candidateDto, String lang) throws Exception {
+
+		CandidateDto resultDto = new CandidateDto();
+
+		Candidate candidate = candidateRepository.findById(candidateDto.getId());
+
+		if (candidate == null) {
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+			resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+			logger.info(resultDto.getMessage());
+			return resultDto;
+		}
+
+		candidate.setRecStatus(HireProUsConstants.REC_STATUS_UPLOADED);
+		candidate.setUpdatedBy(candidateDto.getUpdatedBy());
+		candidate.setUpdatedDateTime(LocalDateTime.now());
+
+		candidateRepository.save(candidate);
+
+		InterviewSchedule InterviewSchedule = interviewScheduleRepository.findByCandidateId(candidateDto.getId());
+		if (InterviewSchedule == null) {
+
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+			resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+			logger.info(resultDto.getMessage());
+			return resultDto;
+		}
+		InterviewSchedule.setRecStatus(HireProUsConstants.REC_STATUS_UPLOADED);
+		InterviewSchedule.setUpdatedBy(candidateDto.getUpdatedBy());
+		InterviewSchedule.setUpdatedDateTime(LocalDateTime.now());
+
+		interviewScheduleRepository.save(InterviewSchedule);
+		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
+		return resultDto;
+	}
 }
