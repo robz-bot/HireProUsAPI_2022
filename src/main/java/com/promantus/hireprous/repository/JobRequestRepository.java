@@ -300,4 +300,6 @@ public interface JobRequestRepository extends MongoRepository<JobRequest, String
 
 	List<JobRequest> findByBuId(long id);
 
+	JobRequest findByReferenceNumberRegex(String jrNumber);
+
 }

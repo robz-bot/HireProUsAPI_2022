@@ -154,6 +154,9 @@ public final class HireProUsConstants {
 
 	/** CANDIDATE_TYPE_EXTERNAL - 'External'. */
 	public static final String CANDIDATE_TYPE_EXTERNAL = "External";
+	
+	/** CANDIDATE_TYPE_EXTERNAL - 'Customer'. */
+	public static final String CANDIDATE_TYPE_CUSTOMER = "Customer";
 
 	// Resource Status
 	// ----------------------------------------------------------------------------------------------------------------

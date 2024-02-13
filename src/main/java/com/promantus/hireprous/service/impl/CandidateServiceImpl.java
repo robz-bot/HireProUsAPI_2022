@@ -2492,38 +2492,266 @@ public class CandidateServiceImpl implements CandidateService {
 	public CandidateDto resumeHoldingCandidate(CandidateDto candidateDto, String lang) throws Exception {
 
 		CandidateDto resultDto = new CandidateDto();
+		// Resuming Hold candidate at Resume shortlisted - 02->00 - working
+		if (candidateDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_HOLDED_0)) {
 
-		Candidate candidate = candidateRepository.findById(candidateDto.getId());
+			Candidate candidate = candidateRepository.findById(candidateDto.getId());
 
-		if (candidate == null) {
-			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
-			resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+			if (candidate == null) {
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
 
-			logger.info(resultDto.getMessage());
-			return resultDto;
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			candidate.setRecStatus(HireProUsConstants.REC_STATUS_UPLOADED);
+			candidate.setUpdatedBy(candidateDto.getUpdatedBy());
+			candidate.setUpdatedDateTime(LocalDateTime.now());
+
+			candidateRepository.save(candidate);
+
+			InterviewSchedule InterviewSchedule = interviewScheduleRepository.findByCandidateId(candidateDto.getId());
+			if (InterviewSchedule == null) {
+
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+			InterviewSchedule.setRecStatus(HireProUsConstants.REC_STATUS_UPLOADED);
+			InterviewSchedule.setUpdatedBy(candidateDto.getUpdatedBy());
+			InterviewSchedule.setUpdatedDateTime(LocalDateTime.now());
+
+			interviewScheduleRepository.save(InterviewSchedule);
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
+		}
+		// Resuming Hold candidate at Internal Round1 - 01->05 // both internal or
+		// external candidates
+		else if (candidateDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_HOLDED_R1)
+				&& (candidateDto.getCandidateType().equals(HireProUsConstants.CANDIDATE_TYPE_EXTERNAL)
+						|| candidateDto.getCandidateType().equals(HireProUsConstants.CANDIDATE_TYPE_INTERNAL))) {
+
+			JobRequest getJobRequest = jobRequestRepository.findByReferenceNumberRegex(candidateDto.getJrNumber());
+
+			Candidate candidate = candidateRepository.findById(candidateDto.getId());
+
+			if (candidate == null) {
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+//			if (getJobRequest.getPlacementFor().equals(HireProUsConstants.CANDIDATE_TYPE_EXTERNAL)) {
+			candidate.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_R1);
+//			}
+			candidate.setUpdatedBy(candidateDto.getUpdatedBy());
+			candidate.setUpdatedDateTime(LocalDateTime.now());
+
+			candidateRepository.save(candidate);
+
+			// new record
+			InterviewSchedule InterviewScheduleNew = new InterviewSchedule();
+			InterviewSchedule InterviewSchedule = interviewScheduleRepository
+					.findByCandidateIdAndRecStatus(candidateDto.getId(), HireProUsConstants.REC_STATUS_HOLDED_R1);
+			if (InterviewSchedule == null) {
+
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			InterviewScheduleNew = InterviewSchedule;
+
+			if (getJobRequest.getPlacementFor().equals(HireProUsConstants.CANDIDATE_TYPE_CUSTOMER)) {
+				InterviewScheduleNew.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_R2);
+				InterviewScheduleNew.setUpdatedBy(candidateDto.getUpdatedBy());
+				InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
+				InterviewScheduleNew.setRound(1);
+				InterviewScheduleNew.setCompleted(0);
+				InterviewScheduleNew.setResultRemarks("Passed IR1");
+			} else {
+				InterviewScheduleNew.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_R1);
+				InterviewScheduleNew.setUpdatedBy(candidateDto.getUpdatedBy());
+				InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
+				InterviewScheduleNew.setRound(1);
+				InterviewScheduleNew.setCompleted(0);
+				InterviewScheduleNew.setResultRemarks("Passed IR1");
+			}
+
+			interviewScheduleRepository.save(InterviewScheduleNew);
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
+		}
+		// Resuming Hold candidate at Internal Round2 - 10->09 // only
+		// internal candidate
+		else if (candidateDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_HOLDED_R2)) {
+
+			Candidate candidate = candidateRepository.findById(candidateDto.getId());
+
+			JobRequest getJobRequest = jobRequestRepository.findByReferenceNumberRegex(candidateDto.getJrNumber());
+
+			if (candidate == null) {
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			candidate.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_CR3);
+
+			candidate.setUpdatedBy(candidateDto.getUpdatedBy());
+			candidate.setUpdatedDateTime(LocalDateTime.now());
+
+			candidateRepository.save(candidate);
+
+			InterviewSchedule InterviewSchedule = new InterviewSchedule();
+
+			// new record
+			InterviewSchedule InterviewScheduleNew = new InterviewSchedule();
+			InterviewSchedule = interviewScheduleRepository.findByCandidateIdAndRecStatus(candidateDto.getId(),
+					HireProUsConstants.REC_STATUS_HOLDED_R2);
+
+			InterviewScheduleNew = InterviewSchedule;
+
+			if (InterviewSchedule == null) {
+
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			if (getJobRequest.getPlacementFor().equals(HireProUsConstants.CANDIDATE_TYPE_INTERNAL)) {
+				InterviewScheduleNew.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_CR3);
+			}
+
+			InterviewScheduleNew = InterviewSchedule;
+			InterviewScheduleNew.setUpdatedBy(candidateDto.getUpdatedBy());
+			InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
+			InterviewScheduleNew.setRound(2);
+			InterviewScheduleNew.setCompleted(0);
+			InterviewScheduleNew.setScheduleRemarks("Passed IR2");
+
+			interviewScheduleRepository.save(InterviewScheduleNew);
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
+		}
+		// Resuming Hold candidate at Customer Round - 10->09 // only
+		// internal candidate
+		else if (candidateDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_HOLDED_CR3)) {
+
+			Candidate candidate = candidateRepository.findById(candidateDto.getId());
+
+			JobRequest getJobRequest = jobRequestRepository.findByReferenceNumberRegex(candidateDto.getJrNumber());
+
+			if (candidate == null) {
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			candidate.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_CR3);
+
+			candidate.setUpdatedBy(candidateDto.getUpdatedBy());
+			candidate.setUpdatedDateTime(LocalDateTime.now());
+
+			candidateRepository.save(candidate);
+
+			InterviewSchedule InterviewSchedule = new InterviewSchedule();
+
+			// new record
+			InterviewSchedule InterviewScheduleNew = new InterviewSchedule();
+			InterviewSchedule = interviewScheduleRepository.findByCandidateIdAndRecStatus(candidateDto.getId(),
+					HireProUsConstants.REC_STATUS_HOLDED_CR3);
+
+			InterviewScheduleNew = InterviewSchedule;
+
+			if (InterviewSchedule == null) {
+
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			if (getJobRequest.getPlacementFor().equals(HireProUsConstants.CANDIDATE_TYPE_CUSTOMER)) {
+				InterviewScheduleNew.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_CR3);
+			}
+
+			InterviewScheduleNew = InterviewSchedule;
+			InterviewScheduleNew.setUpdatedBy(candidateDto.getUpdatedBy());
+			InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
+			InterviewScheduleNew.setRound(3);
+			InterviewScheduleNew.setCompleted(0);
+			InterviewScheduleNew.setScheduleRemarks("Passed CR");
+
+			interviewScheduleRepository.save(InterviewScheduleNew);
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
+		}
+		// Resuming Hold candidate at HR Round - 10->09 // only
+		// internal candidate
+		else if (candidateDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_HOLDED_HR4)) {
+
+			Candidate candidate = candidateRepository.findById(candidateDto.getId());
+
+			JobRequest getJobRequest = jobRequestRepository.findByReferenceNumberRegex(candidateDto.getJrNumber());
+
+			if (candidate == null) {
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			candidate.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_HR4);
+
+			candidate.setUpdatedBy(candidateDto.getUpdatedBy());
+			candidate.setUpdatedDateTime(LocalDateTime.now());
+
+			candidateRepository.save(candidate);
+
+			InterviewSchedule InterviewSchedule = new InterviewSchedule();
+
+			// new record
+			InterviewSchedule InterviewScheduleNew = new InterviewSchedule();
+			InterviewScheduleNew = interviewScheduleRepository.findByCandidateIdAndRecStatus(candidateDto.getId(),
+					HireProUsConstants.REC_STATUS_HOLDED_HR4);
+
+//			InterviewScheduleNew = InterviewSchedule;
+
+			if (InterviewScheduleNew == null) {
+
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			InterviewScheduleNew.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_HR4);
+			InterviewScheduleNew.setUpdatedBy(candidateDto.getUpdatedBy());
+			InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
+			InterviewScheduleNew.setRound(4);
+			InterviewScheduleNew.setCompleted(0);
+			InterviewScheduleNew.setScheduleRemarks("Passed HR");
+
+			interviewScheduleRepository.save(InterviewScheduleNew);
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
 		}
 
-		candidate.setRecStatus(HireProUsConstants.REC_STATUS_UPLOADED);
-		candidate.setUpdatedBy(candidateDto.getUpdatedBy());
-		candidate.setUpdatedDateTime(LocalDateTime.now());
-
-		candidateRepository.save(candidate);
-
-		InterviewSchedule InterviewSchedule = interviewScheduleRepository.findByCandidateId(candidateDto.getId());
-		if (InterviewSchedule == null) {
-
+		else {
 			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
-			resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
-
-			logger.info(resultDto.getMessage());
-			return resultDto;
 		}
-		InterviewSchedule.setRecStatus(HireProUsConstants.REC_STATUS_UPLOADED);
-		InterviewSchedule.setUpdatedBy(candidateDto.getUpdatedBy());
-		InterviewSchedule.setUpdatedDateTime(LocalDateTime.now());
 
-		interviewScheduleRepository.save(InterviewSchedule);
-		resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
 		return resultDto;
 	}
 }

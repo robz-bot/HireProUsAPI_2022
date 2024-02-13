@@ -123,6 +123,8 @@ public interface InterviewScheduleRepository extends MongoRepository<InterviewSc
 
 	InterviewSchedule findByCandidateId(Long id);
 
+	InterviewSchedule findByCandidateIdAndRecStatus(Long id, String recStatusHoldedR1);
+
 	
 
 }
