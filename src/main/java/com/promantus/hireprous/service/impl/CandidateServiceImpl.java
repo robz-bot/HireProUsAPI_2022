@@ -2573,14 +2573,14 @@ public class CandidateServiceImpl implements CandidateService {
 				InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
 				InterviewScheduleNew.setRound(1);
 				InterviewScheduleNew.setCompleted(0);
-				InterviewScheduleNew.setResultRemarks("Passed IR1");
+				InterviewScheduleNew.setResultRemarks("Holded at Resume shortlist, by resuming it moved to passed IR1");
 			} else {
 				InterviewScheduleNew.setRecStatus(HireProUsConstants.REC_STATUS_PASSED_R1);
 				InterviewScheduleNew.setUpdatedBy(candidateDto.getUpdatedBy());
 				InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
 				InterviewScheduleNew.setRound(1);
 				InterviewScheduleNew.setCompleted(0);
-				InterviewScheduleNew.setResultRemarks("Passed IR1");
+				InterviewScheduleNew.setResultRemarks("Holded at Resume shortlist, by resuming it moved to passed IR1");
 			}
 
 			interviewScheduleRepository.save(InterviewScheduleNew);
@@ -2636,7 +2636,7 @@ public class CandidateServiceImpl implements CandidateService {
 			InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
 			InterviewScheduleNew.setRound(2);
 			InterviewScheduleNew.setCompleted(0);
-			InterviewScheduleNew.setScheduleRemarks("Passed IR2");
+			InterviewScheduleNew.setScheduleRemarks("Holded at IR1, by resuming it moved to passed IR2");
 
 			interviewScheduleRepository.save(InterviewScheduleNew);
 			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
@@ -2691,12 +2691,12 @@ public class CandidateServiceImpl implements CandidateService {
 			InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
 			InterviewScheduleNew.setRound(3);
 			InterviewScheduleNew.setCompleted(0);
-			InterviewScheduleNew.setScheduleRemarks("Passed CR");
+			InterviewScheduleNew.setScheduleRemarks("Holded at IR1, by resuming it moved to passed CR");
 
 			interviewScheduleRepository.save(InterviewScheduleNew);
 			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
 		}
-		// Resuming Hold candidate at HR Round - 10->09 // only
+		// Resuming Hold candidate at BU Round - 10->09 // only
 		// internal candidate
 		else if (candidateDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_HOLDED_HR4)) {
 
@@ -2726,8 +2726,6 @@ public class CandidateServiceImpl implements CandidateService {
 			InterviewScheduleNew = interviewScheduleRepository.findByCandidateIdAndRecStatus(candidateDto.getId(),
 					HireProUsConstants.REC_STATUS_HOLDED_HR4);
 
-//			InterviewScheduleNew = InterviewSchedule;
-
 			if (InterviewScheduleNew == null) {
 
 				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
@@ -2742,9 +2740,52 @@ public class CandidateServiceImpl implements CandidateService {
 			InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
 			InterviewScheduleNew.setRound(4);
 			InterviewScheduleNew.setCompleted(0);
-			InterviewScheduleNew.setScheduleRemarks("Passed HR");
+			if (getJobRequest.getPlacementFor().equals(HireProUsConstants.CANDIDATE_TYPE_INTERNAL)) {
+				InterviewScheduleNew.setScheduleRemarks("Holded at IR2, by resuming it moved to passed HR");
+			} else {
+				InterviewScheduleNew.setScheduleRemarks("Holded at CR, by resuming it moved to passed HR");
+			}
 
 			interviewScheduleRepository.save(InterviewScheduleNew);
+			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
+		} else if (candidateDto.getRecStatus().equals(HireProUsConstants.REC_STATUS_HOLDED_BU)) {
+
+			Candidate candidate = candidateRepository.findById(candidateDto.getId());
+
+			if (candidate == null) {
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			candidate.setRecStatus(HireProUsConstants.REC_STATUS_SELECTED);
+
+			candidate.setUpdatedBy(candidateDto.getUpdatedBy());
+			candidate.setUpdatedDateTime(LocalDateTime.now());
+
+			candidateRepository.save(candidate);
+
+			InterviewSchedule InterviewScheduleNew = new InterviewSchedule();
+			InterviewScheduleNew = interviewScheduleRepository.findByCandidateIdAndRecStatus(candidateDto.getId(),
+					HireProUsConstants.REC_STATUS_HOLDED_BU);
+
+			if (InterviewScheduleNew == null) {
+
+				resultDto.setStatus(HireProUsConstants.RETURN_STATUS_ERROR);
+				resultDto.setMessage(commonService.getMessage("invalid", new String[] { "Candidate Id" }, lang));
+
+				logger.info(resultDto.getMessage());
+				return resultDto;
+			}
+
+			InterviewScheduleNew.setUpdatedBy(candidateDto.getUpdatedBy());
+			InterviewScheduleNew.setUpdatedDateTime(LocalDateTime.now());
+			InterviewScheduleNew.setScheduleRemarks("Holded at HR, by resuming it moved to passed at BU");
+
+			interviewScheduleRepository.save(InterviewScheduleNew);
+
 			resultDto.setStatus(HireProUsConstants.RETURN_STATUS_OK);
 		}
 
