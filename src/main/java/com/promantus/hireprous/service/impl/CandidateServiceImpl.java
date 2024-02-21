@@ -604,7 +604,7 @@ public class CandidateServiceImpl implements CandidateService {
 		resultDto.setOnboarded(onboarded);
 		resultDto.setDropped(dropped);
 		resultDto.setOfferRejected(offerRejected);
-		;
+		
 
 		return resultDto;
 	}
@@ -2097,28 +2097,28 @@ public class CandidateServiceImpl implements CandidateService {
 			roundName = "Rejected @ Resume Shortlist";
 			break;
 		case "04":
-			roundName = "Scheduled Internal Round 1";
+			roundName = "Scheduled Technical Round 1";
 			break;
 		case "05":
-			roundName = "Passed Internal Round 1";
+			roundName = "Passed Technical Round 1";
 			break;
 		case "06":
-			roundName = "Hold @ Internal Round 1";
+			roundName = "Hold @ Technical Round 1";
 			break;
 		case "07":
-			roundName = "Rejected @ Internal Round 1";
+			roundName = "Rejected @ Technical Round 1";
 			break;
 		case "08":
-			roundName = "Scheduled Internal Round 2";
+			roundName = "Scheduled Technical Round 2";
 			break;
 		case "09":
-			roundName = "Passed Internal Round 2";
+			roundName = "Passed Technical Round 2";
 			break;
 		case "10":
-			roundName = "Hold @ Internal Round 2";
+			roundName = "Hold @ Technical Round 2";
 			break;
 		case "11":
-			roundName = "Rejected @ Internal Round 2";
+			roundName = "Rejected @ Technical Round 2";
 			break;
 		case "12":
 			roundName = "Scheduled Customer Round";

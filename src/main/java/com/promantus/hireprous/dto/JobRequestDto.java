@@ -50,6 +50,7 @@ public class JobRequestDto implements Serializable {
 	private String optionalSkills;
 
 	private String jobReqStatus;
+	private String jobReqStatusRemarks;
 
 	private Long recruiterId;
 	private String recruiterName;
@@ -806,6 +807,14 @@ public class JobRequestDto implements Serializable {
 
 	public void setMinYearOfExp(String minYearOfExp) {
 		this.minYearOfExp = minYearOfExp;
+	}
+
+	public String getJobReqStatusRemarks() {
+		return jobReqStatusRemarks;
+	}
+
+	public void setJobReqStatusRemarks(String jobReqStatusRemarks) {
+		this.jobReqStatusRemarks = jobReqStatusRemarks;
 	}
 
 	

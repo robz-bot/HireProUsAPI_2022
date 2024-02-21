@@ -239,6 +239,7 @@ public class JobRequestServiceImpl implements JobRequestService {
 		jobRequest.setOptionalSkills(jobRequestDto.getOptionalSkills());
 
 		jobRequest.setJobReqStatus(jobRequestDto.getJobReqStatus());
+		jobRequest.setJobReqStatusRemarks(jobRequestDto.getJobReqStatusRemarks());
 
 		jobRequest.setUpdatedBy(jobRequestDto.getUpdatedBy());
 		jobRequest.setUpdatedDateTime(LocalDateTime.now());
@@ -1009,6 +1010,7 @@ public class JobRequestServiceImpl implements JobRequestService {
 		jobRequestDto.setOptionalSkills(jobRequest.getOptionalSkills());
 
 		jobRequestDto.setJobReqStatus(jobRequest.getJobReqStatus());
+		jobRequestDto.setJobReqStatusRemarks(jobRequest.getJobReqStatusRemarks());
 
 		jobRequestDto.setRecruiterId(jobRequest.getRecruiterId());
 		if (jobRequest.getRecruiterId() != null) {

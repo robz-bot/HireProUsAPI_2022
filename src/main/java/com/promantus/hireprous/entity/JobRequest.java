@@ -49,6 +49,7 @@ public class JobRequest {
 	private String optionalSkills;
 
 	private String jobReqStatus;
+	private String jobReqStatusRemarks;
 
 	private Long recruiterId;
 
@@ -530,6 +531,14 @@ public class JobRequest {
 
 	public void setMinYearOfExp(String minYearOfExp) {
 		this.minYearOfExp = minYearOfExp;
+	}
+
+	public String getJobReqStatusRemarks() {
+		return jobReqStatusRemarks;
+	}
+
+	public void setJobReqStatusRemarks(String jobReqStatusRemarks) {
+		this.jobReqStatusRemarks = jobReqStatusRemarks;
 	}
 
 	
