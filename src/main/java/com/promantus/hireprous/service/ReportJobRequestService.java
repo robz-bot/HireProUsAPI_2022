@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.promantus.hireprous.dto.JobRequestDto;
+import com.promantus.hireprous.dto.UserDto;
+import com.promantus.hireprous.dto.UserSearchDto;
 
 
 /**
@@ -60,4 +62,14 @@ public interface ReportJobRequestService {
 	 * @throws Exception
 	 */
 	List<JobRequestDto> searchJobRequestByStatus(String jobRequestStatus) throws Exception;
+	
+	//new cahange
+		//getgetAllUsersReports
+		List<UserDto> getAllUsersReports() throws Exception;
+
+		//searchUserReports
+		List<UserDto> searchUserReports(UserSearchDto userSearchDto, String lang) throws Exception;
+
+		//downloadUserReportsDetails
+		byte[] downloadUserReportsDetails(List<UserDto> userDtoList, String lang) throws Exception;
 }

@@ -6,10 +6,13 @@ package com.promantus.hireprous.service.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -23,6 +26,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.text.BaseColor;
@@ -37,16 +46,28 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.promantus.hireprous.HireProUsDefaultMethods;
+import com.promantus.hireprous.dto.CustomerDto;
+import com.promantus.hireprous.HireProUsConstants;
 import com.promantus.hireprous.dto.JobRequestDto;
+import com.promantus.hireprous.dto.UserDto;
+import com.promantus.hireprous.dto.UserSearchDto;
 import com.promantus.hireprous.entity.JobRequest;
+import com.promantus.hireprous.entity.Role;
+import com.promantus.hireprous.entity.User;
 import com.promantus.hireprous.repository.JobRequestRepository;
+import com.promantus.hireprous.repository.UserRepository;
 import com.promantus.hireprous.service.BusinessUnitService;
 import com.promantus.hireprous.service.CommonService;
 import com.promantus.hireprous.service.CustomerService;
+import com.promantus.hireprous.service.ImageService;
 import com.promantus.hireprous.service.RecruitmentRoleService;
 import com.promantus.hireprous.service.ReportJobRequestService;
+import com.promantus.hireprous.service.RoleMenuMappingService;
+import com.promantus.hireprous.service.RoleService;
 import com.promantus.hireprous.util.CacheUtil;
 import com.promantus.hireprous.util.HireProUsUtil;
+
 
 /**
  * @author Promantus.
@@ -75,6 +96,25 @@ public class ReportJobRequestServiceImpl implements ReportJobRequestService {
 
 	@Autowired
 	JobRequestRepository reportJobRequestRepository;
+	
+	@Autowired
+	UserRepository userRepository;
+	
+	@Autowired
+	MongoTemplate mongoTemplate;
+	
+	@Autowired
+	ResourceLoader resourceLoader;
+
+	
+	@Autowired
+	ImageService imageService;
+	
+	@Autowired
+	RoleService roleService;
+	
+	@Autowired
+	RoleMenuMappingService roleMenuMappingService;
 
 	@Override
 	public List<JobRequestDto> getJobRequestByProjectStartDateBetween(LocalDate startDate, LocalDate endDateDate)
@@ -395,5 +435,182 @@ public class ReportJobRequestServiceImpl implements ReportJobRequestService {
 	 * @return
 	 * @throws Exception
 	 */
+	
+	//new feature
+		@Override
+		public List<UserDto> getAllUsersReports() throws Exception {
+			// TODO Auto-generated method stub
+			
+			List<User> usersList = userRepository.findAll(HireProUsUtil.orderByUpdatedDateTimeDesc());
+
+			List<UserDto> userDtoList = new ArrayList<UserDto>();
+			for (User user : usersList) {
+				userDtoList.add(this.getUserDto(user));
+			}
+
+			return userDtoList;	
+		}
+
+		private UserDto getUserDto(User user) throws Exception {
+			// TODO Auto-generated method stub
+			UserDto userDto = new UserDto();
+
+			userDto.setId(user.getId());
+			userDto.setEmail(user.getEmail());
+			userDto.setFirstName(user.getFirstName());
+			userDto.setLastName(user.getLastName());
+			userDto.setFullName(user.getFirstName() + " " + user.getLastName());
+			userDto.setContactNumber(user.getContactNumber());
+
+			userDto.setSex(user.getSex());
+			userDto.setSkillSet(user.getSkillSet());
+			userDto.setLocation(user.getLocation());
+			userDto.setDesignation(user.getDesignation());
+			userDto.setPanelMember(user.getPanelMember());
+			userDto.setColorCode(user.getColorCode());
+			userDto.setManagerId(user.getManagerId());
+			userDto.setManagerName(CacheUtil.getUsersMap().get(user.getManagerId()));
+			userDto.setActive(user.getActive());
+
+			userDto.setBusinessUnitId(user.getBusinessUnitId());
+			userDto.setBusinessUnitName(CacheUtil.getBusMap().get(user.getBusinessUnitId()));
+
+			userDto.setRoleId(user.getRoleId());
+			userDto.setRoleName(CacheUtil.getRolesMap().get(user.getRoleId()));
+
+			userDto.setImage(imageService.getImage(HireProUsConstants.USER_IMAGE_PREFIX + user.getId()));
+
+			userDto.setMainMenus("");
+			userDto.setSubMenus("");
+			Role role = roleService.getRoleById(user.getRoleId());
+			if (role != null) {
+				userDto.setMainMenus(roleMenuMappingService.getMainMenusForLogin(role));
+				userDto.setSubMenus(roleMenuMappingService.getSubMenusForLogin(role));
+			}
+
+			userDto.setCreatedBy(user.getCreatedBy());
+			userDto.setCreatedByName(CacheUtil.getUsersMap().get(user.getCreatedBy()));
+			userDto.setCreatedDateTime(HireProUsUtil.getGMTDateTime(user.getCreatedDateTime()));
+
+			userDto.setUpdatedBy(user.getUpdatedBy());
+			userDto.setUpdatedByName(CacheUtil.getUsersMap().get(user.getUpdatedBy()));
+			userDto.setUpdatedDateTime(HireProUsUtil.getGMTDateTime(user.getUpdatedDateTime()));
+
+			userDto.setDateOfJoining(user.getDateOfJoining());
+			userDto.setDateOfBirth(user.getDateOfBirth());
+			
+			return userDto;
+			
+		}	
+		
+		@Override
+		public List<UserDto> searchUserReports(UserSearchDto userSearchDto, String lang) throws Exception {
+		    // TODO Auto-generated method stub
+
+		    final List<Criteria> criteriaList = new ArrayList<>();
+
+		    if (userSearchDto.getEmail() != null && !userSearchDto.getEmail().isEmpty()) {
+		        criteriaList.add(Criteria.where("email").regex("(?i).*" + userSearchDto.getEmail() + ".*"));
+		    }
+		    if (userSearchDto.getName() != null && !userSearchDto.getName().isEmpty()) {
+		    	AggregationOperation project = Aggregation.project(User.class)
+						.andExpression("concat(firstName,' ', lastName)").as("fullName");
+				AggregationOperation match = Aggregation
+						.match(Criteria.where("fullName").regex("(?i).*" + userSearchDto.getName() + ".*"));
+				Aggregation aggregation = Aggregation.newAggregation(project, match);
+				List<User> usersList = mongoTemplate.aggregate(aggregation, User.class, User.class).getMappedResults();
+
+				List<Long> userIds = new ArrayList<Long>();
+				for (User user : usersList) {
+					userIds.add(user.getId());
+				}
+				if (userIds.size() > 0) {
+					criteriaList.add(Criteria.where("id").in(userIds));
+				} else {
+					return new ArrayList<UserDto>();
+				}
+			}
+		    if (userSearchDto.getBuId() != null && !userSearchDto.getBuId().equals(0L)) {
+		        criteriaList.add(Criteria.where("businessUnitId").is(userSearchDto.getBuId()));
+		    }
+		    if (userSearchDto.getRoleId() != null && !userSearchDto.getRoleId().equals(0L)) {
+		        criteriaList.add(Criteria.where("roleId").is(userSearchDto.getRoleId()));
+		    }
+		    if (userSearchDto.getSex() != null && !userSearchDto.getSex().isEmpty()) {
+		        criteriaList.add(Criteria.where("sex").is(userSearchDto.getSex()));
+		    }
+		    if (userSearchDto.getPanelMember() != null && !userSearchDto.getPanelMember().isEmpty()) {
+		        criteriaList.add(Criteria.where("panelMember").is(userSearchDto.getPanelMember()));
+		    }
+		    if (userSearchDto.getLocation() != null && !userSearchDto.getLocation().isEmpty()) {
+		        criteriaList.add(Criteria.where("location").regex("(?i).*" + userSearchDto.getLocation() + ".*"));
+		    }
+
+		    List<User> usersList = new ArrayList<>();
+		    if (!criteriaList.isEmpty()) {
+		        Query searchQuery = new Query();
+		        searchQuery.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
+		        usersList = mongoTemplate.find(searchQuery, User.class);
+		    }
+
+		    List<UserDto> userDtoList = new ArrayList<>();
+		    for (User user : usersList) {
+		        userDtoList.add(this.getUserDto(user));
+		    }
+
+		    Comparator<UserDto> compareByUpdatedDateTime = Comparator.comparing(UserDto::getUpdatedDateTime);
+		    userDtoList = userDtoList.stream().sorted(compareByUpdatedDateTime).collect(Collectors.toList());
+
+		    return userDtoList;
+		}
+
+		@Override
+		public byte[] downloadUserReportsDetails(List<UserDto> userDtoList, String lang) throws Exception {
+			// TODO Auto-generated method stub
+			
+			File file = resourceLoader.getResource("classpath:excel-templates/user_details.xlsx").getFile();
+			System.out.println("checking::::::::::::::::::::::::::");
+			try (Workbook UserDetailsWB = new XSSFWorkbook(file)) {
+
+				
+				Sheet sheet = UserDetailsWB.getSheetAt(0);
+				
+				HireProUsDefaultMethods.cleanSheet(sheet);
+				
+				int rowNum = 2;
+				for (UserDto userDto : userDtoList) {
+
+					Row dataRow = sheet.createRow(rowNum);
+
+					Cell slNo = dataRow.createCell(0);
+					slNo.setCellValue(rowNum - 1);
+
+//					dataRow.createCell(1).setCellValue(customerDto.getId());
+					dataRow.createCell(1).setCellValue(userDto.getFullName());
+					dataRow.createCell(2).setCellValue(userDto.getSex().equals("1") ? "Male" : "Female");
+					dataRow.createCell(3).setCellValue(userDto.getActive().equals("1") ? "Active" : "Inactive");
+					dataRow.createCell(4).setCellValue(userDto.getRoleName());
+					dataRow.createCell(5).setCellValue(userDto.getBusinessUnitName());
+					dataRow.createCell(6).setCellValue(userDto.getDesignation());
+					dataRow.createCell(7).setCellValue(userDto.getLocation());
+					dataRow.createCell(8).setCellValue(userDto.getPanelMember().equals("1") ? "Yes" : "No");
+					dataRow.createCell(9).setCellValue(userDto.getUpdatedDateTime().toString());
+
+					rowNum++;
+				}
+
+				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+				UserDetailsWB.write(outputStream);
+
+				UserDetailsWB.close();
+
+				return outputStream.toByteArray();
+
+			} catch (Exception ex) {
+				logger.error("Error during User Details download file", ex);
+				return null;
+			}
+		
+		}
 
 }
